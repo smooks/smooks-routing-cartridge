@@ -9,4 +9,4 @@
 * JDK 8 or higher
 * Maven 3
 
-## [Documentation](https://www.smooks.org/documentation/#Splitting_.26_Routing)
+## [Documentation](https://www.smooks.org/documentation/#splitting--routing)
