@@ -41,9 +41,6 @@
                     <organizationName>Smooks</organizationName>
                     <processStartTag>========================LICENSE_START=================================</processStartTag>
                     <processEndTag>=========================LICENSE_END==================================</processEndTag>
-                    <excludes>
-                        <exclude>test/resources/data/simpleCSV.xml</exclude>
-                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
