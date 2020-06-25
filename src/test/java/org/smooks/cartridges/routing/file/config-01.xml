@@ -51,7 +51,7 @@
         <param name="stream.filter.type">SAX</param>
     </params>
 
-    <jb:bean beanId="object" class="java.util.HashMap" createOnElement="$document">
+    <jb:bean beanId="object" class="java.util.HashMap" createOnElement="#document">
         <jb:value property="a" data="a" />
     </jb:bean>
 
