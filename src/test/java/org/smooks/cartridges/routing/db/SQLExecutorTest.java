@@ -221,7 +221,7 @@ public class SQLExecutorTest {
         try {
             ExecutionContext execContext = smooks.createExecutionContext();
             BeanContext beanContext = execContext.getBeanContext();
-            BeanIdStore beanIdStore =  execContext.getContext().getBeanIdStore();
+            BeanIdStore beanIdStore =  execContext.getApplicationContext().getBeanIdStore();
 
             BeanId requiredOrderNumId = beanIdStore.register("requiredOrderNum");
 

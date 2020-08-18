@@ -42,6 +42,8 @@
  */
 package org.smooks.cartridges.routing.basic;
 
+import org.smooks.SmooksException;
+import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
 import org.smooks.delivery.VisitLifecycleCleanable;
 import org.smooks.delivery.dom.DOMVisitAfter;
@@ -56,20 +58,18 @@ import org.smooks.namespace.NamespaceDeclarationStack;
 import org.smooks.util.CollectionsUtil;
 import org.smooks.xml.NamespaceMappings;
 import org.smooks.xml.XmlUtil;
-import org.smooks.container.ExecutionContext;
-import org.smooks.SmooksException;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
+import javax.inject.Inject;
+import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-
-import javax.xml.XMLConstants;
 
 /**
  * Basic message fragment serializer.
@@ -88,7 +88,7 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
 	 * @param bindTo The bind-to beanId for the serialized fragment.
 	 * @return this instance.
 	 */
-    @ConfigParam
+    @Inject
 	public FragmentSerializer setBindTo(String bindTo) {
 		this.bindTo = bindTo;
 		return this;
@@ -99,9 +99,9 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
 	 * @param omitXMLDeclaration True if the XML declaration is to be omitted, otherwise false.
 	 * @return this instance.
 	 */
-    @ConfigParam(defaultVal = "false")
-	public FragmentSerializer setOmitXMLDeclaration(boolean omitXMLDeclaration) {
-		this.omitXMLDeclaration = omitXMLDeclaration;
+    @Inject
+	public FragmentSerializer setOmitXMLDeclaration(Optional<Boolean> omitXMLDeclaration) {
+		this.omitXMLDeclaration = omitXMLDeclaration.orElse(false);
 		return this;
 	}
 
@@ -114,9 +114,9 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
 	 * the targeted element itself), otherwise false.
 	 * @return this instance.
 	 */
-    @ConfigParam(defaultVal = "false")
-	public FragmentSerializer setChildContentOnly(boolean childContentOnly) {
-		this.childContentOnly = childContentOnly;
+    @Inject
+	public FragmentSerializer setChildContentOnly(Optional<Boolean> childContentOnly) {
+		this.childContentOnly = childContentOnly.orElse(false);
 		return this;
 	}
 
@@ -128,9 +128,9 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
      * otherwise false.
 	 * @return this instance.
 	 */
-    @ConfigParam(defaultVal = "false")
-    public FragmentSerializer setRetain(boolean retain) {
-        this.retain = retain;
+    @Inject
+    public FragmentSerializer setRetain(Optional<Boolean> retain) {
+        this.retain = retain.orElse(false);
         return this;
     }
 

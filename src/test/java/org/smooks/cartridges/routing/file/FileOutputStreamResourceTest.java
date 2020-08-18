@@ -42,10 +42,30 @@
  */
 package org.smooks.cartridges.routing.file;
 
-import static org.testng.AssertJUnit.*;
-import org.testng.annotations.BeforeClass;
+import org.smooks.FilterSettings;
+import org.smooks.Smooks;
+import org.smooks.cartridges.javabean.Bean;
+import org.smooks.cartridges.templating.OutputTo;
+import org.smooks.cartridges.templating.TemplatingConfiguration;
+import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
+import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.injector.Scope;
+import org.smooks.cdr.lifecycle.LifecycleManager;
+import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.cdr.registry.Registry;
+import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
+import org.smooks.container.ExecutionContext;
+import org.smooks.container.MockApplicationContext;
+import org.smooks.container.MockExecutionContext;
+import org.smooks.delivery.Fragment;
+import org.smooks.io.AbstractOutputStreamResource;
+import org.smooks.io.FileUtils;
+import org.smooks.payload.StringSource;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,23 +74,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 
-import org.smooks.FilterSettings;
-import org.smooks.Smooks;
-import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.Configurator;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.MockApplicationContext;
-import org.smooks.container.MockExecutionContext;
-import org.smooks.delivery.Fragment;
-import org.smooks.io.AbstractOutputStreamResource;
-import org.smooks.io.FileUtils;
-import org.smooks.cartridges.javabean.Bean;
-import org.smooks.payload.StringSource;
-import org.smooks.cartridges.templating.OutputTo;
-import org.smooks.cartridges.templating.TemplatingConfiguration;
-import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
+import static org.testng.AssertJUnit.*;
 
 /**
  * Unit test for {@link FileOutputStreamResource}
@@ -92,8 +96,10 @@ public class FileOutputStreamResourceTest
 	
     @BeforeClass
     public void setUp() throws Exception {
+        Registry registry = new MockApplicationContext().getRegistry();
+        LifecycleManager lifecycleManager = registry.lookup(new LifecycleManagerLookup());
         config = createConfig( resourceName, fileNamePattern, destinationDirectory, listFileName);
-        Configurator.configure( resource, config, new MockApplicationContext() );
+        lifecycleManager.applyPhase(resource, new PostConstructLifecyclePhase(new Scope(registry, config, resource)));
         deleteFiles();
     }
 

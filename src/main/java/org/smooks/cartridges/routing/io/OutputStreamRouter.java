@@ -42,29 +42,29 @@
  */
 package org.smooks.cartridges.routing.io;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-
 import org.smooks.SmooksException;
 import org.smooks.cartridges.routing.file.FileOutputStreamResource;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
 import org.smooks.delivery.dom.DOMElementVisitor;
+import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.sax.SAXElement;
 import org.smooks.delivery.sax.SAXVisitAfter;
 import org.smooks.delivery.sax.SAXVisitBefore;
-import org.smooks.delivery.ordering.Consumer;
 import org.smooks.io.AbstractOutputStreamResource;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.repository.BeanId;
 import org.w3c.dom.Element;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
 /**
  * OutputStreamRouter is a fragment Visitor (DOM/SAX) that can be used to route
@@ -96,31 +96,30 @@ import org.w3c.dom.Element;
 @VisitBeforeIf(	condition = "!parameters.containsKey('visitAfter') || parameters.visitAfter.value != 'true'")
 public class OutputStreamRouter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer
 {
-	@ConfigParam
+	@Inject
 	private String resourceName;
 
     /*
      *	Character encoding to be used when writing character output
      */
-    @ConfigParam( use = ConfigParam.Use.OPTIONAL, defaultVal = "UTF-8" )
-	private String encoding;
+    @Inject
+	private String encoding = "UTF-8";
 
 	/*
 	 * 	beanId is a key that is used to look up a bean in the execution context
 	 */
-    @ConfigParam( name = "beanId", use = ConfigParam.Use.REQUIRED )
+    @Inject
+	@Named("beanId")
     private String beanIdName;
 
     private BeanId beanId;
 
-    @AppContext
+    @Inject
     private ApplicationContext applicationContext;
 
-    @Initialize
+    @PostConstruct
     public void initialize() throws SmooksConfigurationException {
-
     	beanId = applicationContext.getBeanIdStore().getBeanId(beanIdName);
-
     }
 
     //	public

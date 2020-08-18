@@ -42,26 +42,25 @@
  */
 package org.smooks.cartridges.routing.jms.activemq;
 
-import static org.testng.AssertJUnit.*;
-
+import org.smooks.FilterSettings;
+import org.smooks.Smooks;
+import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.routing.jms.JMSRouter;
 import org.smooks.cartridges.routing.jms.TestJMSMessageListener;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.Test;
-
-import org.smooks.Smooks;
-import org.smooks.FilterSettings;
-import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
-import org.smooks.cartridges.templating.TemplatingConfiguration;
 import org.smooks.cartridges.templating.BindTo;
-import org.smooks.cartridges.javabean.Bean;
+import org.smooks.cartridges.templating.TemplatingConfiguration;
+import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
 import org.smooks.payload.StringSource;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
 import java.io.IOException;
 import java.util.HashMap;
+
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
@@ -124,7 +123,7 @@ public class ActiveMQTest {
         jmsRouter.setDestinationName("objectAQueue");
         jmsRouter.setBeanId("orderItem_xml");
         jmsRouter.setCorrelationIdPattern("${object.a}");
-        jmsRouter.setJndiProperties("/org/smooks/cartridges/routing/jms/activemq/activemq.1.jndi.properties");
+        jmsRouter.setJndiProperties(java.util.Optional.of("/org/smooks/cartridges/routing/jms/activemq/activemq.1.jndi.properties"));
         smooks.addVisitor(jmsRouter, "a");
     }
 

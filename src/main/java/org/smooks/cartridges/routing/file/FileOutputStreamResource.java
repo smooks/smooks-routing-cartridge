@@ -42,26 +42,25 @@
  */
 package org.smooks.cartridges.routing.file;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cartridges.routing.SmooksRoutingException;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.annotation.ConfigParam;
-import org.smooks.cdr.annotation.ConfigParam.Use;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.expression.ExpressionEvaluator;
 import org.smooks.expression.MVELExpressionEvaluator;
 import org.smooks.io.AbstractOutputStreamResource;
-import org.smooks.javabean.decoders.MVELExpressionEvaluatorDecoder;
 import org.smooks.util.DollarBraceDecoder;
 import org.smooks.util.FreeMarkerTemplate;
 import org.smooks.util.FreeMarkerUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.io.*;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,33 +121,33 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileOutputStreamResource.class);
 
-    @ConfigParam
+    @Inject
     private String fileNamePattern;
     private FreeMarkerTemplate fileNameTemplate;
 
-    @ConfigParam
+    @Inject
     private String destinationDirectoryPattern;
     private FreeMarkerTemplate destinationDirectoryTemplate;
     private FileFilter fileFilter;
 
-    @ConfigParam(use = ConfigParam.Use.OPTIONAL)
-    private String listFileNamePattern;
+    @Inject
+    private Optional<String> listFileNamePattern;
     private FreeMarkerTemplate listFileNameTemplate;
 
-    @ConfigParam(use = ConfigParam.Use.OPTIONAL)
-    private boolean append;
+    @Inject
+    private Boolean append = false;
 
     private String listFileNamePatternCtxKey;
 
-    @ConfigParam(defaultVal = "200")
-    private int highWaterMark = 200;
-    @ConfigParam(defaultVal = "60000")
-    private long highWaterMarkTimeout = 60000;
-    @ConfigParam(defaultVal = "1000")
-    private long highWaterMarkPollFrequency = 1000;
+    @Inject
+    private Integer highWaterMark = 200;
+    @Inject
+    private Long highWaterMarkTimeout = 60000L;
+    @Inject
+    private Long highWaterMarkPollFrequency = 1000L;
 
-    @ConfigParam(use = Use.OPTIONAL, decoder = MVELExpressionEvaluatorDecoder.class)
-    private ExpressionEvaluator closeOnCondition;
+    @Inject
+    private Optional<ExpressionEvaluator> closeOnCondition;
 
     //	public
 
@@ -166,7 +165,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
 
     public FileOutputStreamResource setListFileNamePattern(String listFileNamePattern) {
         AssertArgument.isNotNullAndNotEmpty(listFileNamePattern, "listFileNamePattern");
-        this.listFileNamePattern = listFileNamePattern;
+        this.listFileNamePattern = Optional.of(listFileNamePattern);
         return this;
     }
 
@@ -193,8 +192,8 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
 
     public void setCloseOnCondition(String closeOnCondition) {
         AssertArgument.isNotNullAndNotEmpty(closeOnCondition, "closeOnCondition");
-        this.closeOnCondition = new MVELExpressionEvaluator();
-        this.closeOnCondition.setExpression(closeOnCondition);
+        this.closeOnCondition = Optional.of(new MVELExpressionEvaluator());
+        this.closeOnCondition.get().setExpression(closeOnCondition);
     }
 
     public FileOutputStreamResource setAppend(boolean append) {
@@ -202,7 +201,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
         return this;
     }
 
-    @Initialize
+    @PostConstruct
     public void initialize() throws SmooksConfigurationException {
         if (fileNamePattern == null) {
             throw new SmooksConfigurationException("Null 'fileNamePattern' configuration parameter.");
@@ -216,8 +215,8 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
 
         fileFilter = new SplitFilenameFilter(fileNamePattern);
 
-        if (listFileNamePattern != null) {
-            listFileNameTemplate = new FreeMarkerTemplate(listFileNamePattern);
+        if (listFileNamePattern.isPresent()) {
+            listFileNameTemplate = new FreeMarkerTemplate(listFileNamePattern.get());
             listFileNamePatternCtxKey = FileOutputStreamResource.class.getName() + "#" + listFileNamePattern;
         }
     }
@@ -297,12 +296,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
      */
     @Override
     protected boolean closeCondition(ExecutionContext executionContext) {
-
-        if (closeOnCondition == null) {
-            return true;
-        }
-
-        return closeOnCondition.eval(executionContext.getBeanContext().getBeanMap());
+        return closeOnCondition.map(expressionEvaluator -> expressionEvaluator.eval(executionContext.getBeanContext().getBeanMap())).orElse(true);
     }
 
     @Override

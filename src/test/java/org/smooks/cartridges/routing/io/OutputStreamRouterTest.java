@@ -42,13 +42,17 @@
  */
 package org.smooks.cartridges.routing.io;
 
-import static org.testng.AssertJUnit.*;
-
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.Configurator;
+import org.smooks.cdr.injector.Scope;
+import org.smooks.cdr.lifecycle.LifecycleManager;
+import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.cdr.registry.Registry;
+import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.MockApplicationContext;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * Unit test for {@link OutputStreamRouter}
@@ -63,13 +67,15 @@ public class OutputStreamRouterTest
 	private String beanId = "testBeanId";
 	private OutputStreamRouter router = new OutputStreamRouter();
 	private SmooksResourceConfiguration config;
-	
+
 	@Test
-	public void configure()
-	{
-        Configurator.configure( router, config, new MockApplicationContext() );
-        
-        assertEquals( resourceName, router.getResourceName() );
+	public void configure() {
+		Registry registry = new MockApplicationContext().getRegistry();
+		LifecycleManager lifecycleManager = registry.lookup(new LifecycleManagerLookup());
+		
+		lifecycleManager.applyPhase(router, new PostConstructLifecyclePhase(new Scope(registry, config, router)));
+		
+		assertEquals(resourceName, router.getResourceName());
 	}
 	
 	@BeforeTest

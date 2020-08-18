@@ -1,6 +1,6 @@
 /*-
  * ========================LICENSE_START=================================
- * smooks-routing-cartridge
+ * Smooks Routing Cartridge
  * %%
  * Copyright (C) 2020 Smooks
  * %%
@@ -40,60 +40,24 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.routing.jms.message.creationstrategies;
+package org.smooks.cartridges.routing.jms;
 
-/**
- * Factory for creating {@link MessageCreationStrategy} instaces
- *
- * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>
- *
- */
-public final class StrategyFactory {
-	
-	public enum StrategyFactoryEnum {
-		TEXT_MESSAGE("TextMessage"), OBJECT_MESSAGE("ObjectMessage");
+public enum DeliveryMode {
+    
+    PERSISTENT("persistent"), NON_PERSISTENT("non-persistent");
 
-		private final String value;
+    private final String value;
 
-		StrategyFactoryEnum(final String v) {
-			value = v;
-		}
+    DeliveryMode (final String v) {
+        value = v;
+    }
 
-		public String value() {
-			return value;
-		}
+    public String value() {
+        return value;
+    }
 
-		@Override
-		public String toString() {
-			return String.valueOf(value);
-		}
-	}
-
-	private static StrategyFactory instance = new StrategyFactory();
-
-	private StrategyFactory() {
-	}
-
-	;
-
-	public static StrategyFactory getInstance() {
-		return instance;
-	}
-
-	public static final String TEXT_MESSAGE = "TextMessage";
-	public static final String OBJECT_MESSAGE = "ObjectMessage";
-	public static final String MAP_MESSAGE = "MapMessage";
-
-	public MessageCreationStrategy createStrategy(final String messageType) {
-		if (messageType.equals(TEXT_MESSAGE)) {
-			return new TextMessageCreationStrategy();
-		} else if (messageType.equals(OBJECT_MESSAGE)) {
-			return new ObjectMessageCreationStrategy();
-		} else if (messageType.equals(MAP_MESSAGE)) {
-			return new MapMessageCreationStrategy();
-		}
-
-		throw new IllegalArgumentException("No strategy for messageType [" + messageType + "] was found.");
-	}
-
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
 }
