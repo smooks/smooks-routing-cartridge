@@ -47,13 +47,10 @@ import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.cdr.SmooksResourceConfigurationFactory;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.db.AbstractDataSource;
 import org.smooks.delivery.Fragment;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
 import org.smooks.delivery.dom.DOMElementVisitor;
@@ -64,13 +61,13 @@ import org.smooks.delivery.sax.SAXVisitAfter;
 import org.smooks.delivery.sax.SAXVisitBefore;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
-import org.smooks.javabean.DataDecodeException;
-import org.smooks.javabean.DataDecoder;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.repository.BeanId;
 import org.smooks.util.CollectionsUtil;
 import org.w3c.dom.Element;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -89,26 +86,26 @@ import java.util.*;
 @VisitAfterReport(summary = "Execute statement '${resource.parameters.statement}' on Datasource '${resource.parameters.datasource}'.", detailTemplate = "reporting/SQLExecutor.html")
 public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisitBefore, SAXVisitAfter, DOMElementVisitor, Producer, Consumer {
 
-    @ConfigParam
+    @Inject
     private String datasource;
 
-    @ConfigParam
+    @Inject
     private String statement;
     private StatementExec statementExec;
     private String rsAppContextKey;
 
-    @ConfigParam(use = ConfigParam.Use.OPTIONAL)
-    private String resultSetName;
+    @Inject
+    private Optional<String> resultSetName;
 
-    @ConfigParam(defaultVal = "EXECUTION", choice = {"EXECUTION", "APPLICATION"}, decoder = ResultSetScopeDecoder.class)
+    @Inject
     private ResultSetScope resultSetScope = ResultSetScope.EXECUTION;
 
-    @ConfigParam(defaultVal = "900000")
-    private long resultSetTTL = 900000L;
+    @Inject
+    private Long resultSetTTL = 900000L;
 
     private boolean executeBefore = false;
 
-    @AppContext
+    @Inject
     private ApplicationContext appContext;
 
     private BeanId resultSetBeanId;
@@ -127,12 +124,12 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
 
     public SQLExecutor setResultSetName(String resultSetName) {
         AssertArgument.isNotNullAndNotEmpty(resultSetName, "resultSetName");
-        this.resultSetName = resultSetName;
+        this.resultSetName = Optional.of(resultSetName);
         return this;
     }
 
     public String getResultSetName() {
-        return resultSetName;
+        return resultSetName.orElse(null);
     }
 
     public SQLExecutor setResultSetScope(ResultSetScope resultSetScope) {
@@ -157,15 +154,15 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
         return config;
     }
 
-    @Initialize
+    @PostConstruct
     public void intitialize() throws SmooksConfigurationException {
         statementExec = new StatementExec(statement);
-        if(statementExec.getStatementType() == StatementType.QUERY && resultSetName == null) {
+        if(statementExec.getStatementType() == StatementType.QUERY && !resultSetName.isPresent()) {
             throw new SmooksConfigurationException("Sorry, query statements must be accompanied by a 'resultSetName' property, under whose value the query results are bound.");
         }
 
-        if(resultSetName != null) {
-	        resultSetBeanId = appContext.getBeanIdStore().register(resultSetName);
+        if(resultSetName.isPresent()) {
+	        resultSetBeanId = appContext.getBeanIdStore().register(resultSetName.get());
         }
         rsAppContextKey = datasource + ":" + statement;
     }
@@ -216,7 +213,7 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
                     } else {
                         List<Map<String, Object>> resultMap;
                         // Cached in the application context...
-                        ApplicationContext appContext = executionContext.getContext();
+                        ApplicationContext appContext = executionContext.getApplicationContext();
                         ResultSetContextObject rsContextObj = ResultSetContextObject.getInstance(rsAppContextKey, appContext);
 
                         if(rsContextObj.hasExpired()) {
@@ -262,23 +259,6 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
         }
     }
 
-
-    public static class ResultSetScopeDecoder implements DataDecoder {
-
-        public Object decode(String data) throws DataDecodeException {
-            ResultSetScope scope;
-
-            data = data.trim();
-            try {
-                scope = ResultSetScope.valueOf(data);
-            } catch (IllegalArgumentException e) {
-                throw new DataDecodeException("Failed to decode ResultSetScope value '" + data + "'.  Allowed values are " + Arrays.asList(ResultSetScope.values()) + ".");
-            }
-
-            return scope;
-        }
-    }
-
     private static class ResultSetContextObject {
         private List<Map<String, Object>> resultSet;
         private long expiresAt = 0L;
@@ -288,14 +268,14 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
         }
 
         private static ResultSetContextObject getInstance(String rsAppContextKey, ApplicationContext appContext) {
-            ResultSetContextObject rsContextObj = (ResultSetContextObject) appContext.getAttribute(rsAppContextKey);
+            ResultSetContextObject rsContextObj = (ResultSetContextObject) appContext.getRegistry().lookup(rsAppContextKey);
 
             if(rsContextObj == null) {
                 synchronized (appContext) {
-                    rsContextObj = (ResultSetContextObject) appContext.getAttribute(rsAppContextKey);
+                    rsContextObj = (ResultSetContextObject) appContext.getRegistry().lookup(rsAppContextKey);
                     if(rsContextObj == null) {
                         rsContextObj = new ResultSetContextObject();
-                        appContext.setAttribute(rsAppContextKey, rsContextObj);
+                        appContext.getRegistry().registerObject(rsAppContextKey, rsContextObj);
                     }
                 }
             }

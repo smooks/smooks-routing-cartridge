@@ -42,17 +42,16 @@
  */
 package org.smooks.cartridges.routing.db;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.cdr.SmooksResourceConfigurationFactory;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
 import org.smooks.delivery.dom.DOMElementVisitor;
@@ -65,14 +64,14 @@ import org.smooks.expression.ExpressionEvaluator;
 import org.smooks.expression.MVELExpressionEvaluator;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.context.BeanIdStore;
-import org.smooks.javabean.decoders.MVELExpressionEvaluatorDecoder;
 import org.smooks.javabean.repository.BeanId;
 import org.smooks.util.CollectionsUtil;
 import org.smooks.util.FreeMarkerTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.*;
 
@@ -85,16 +84,18 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultsetRowSelector.class);
 
-    @ConfigParam
+    @Inject
     private String resultSetName;
 
-    @ConfigParam(name = "where", decoder = MVELExpressionEvaluatorDecoder.class)
+    @Inject
+    @Named("where")
     private ExpressionEvaluator whereEvaluator;
 
-    @ConfigParam(use = ConfigParam.Use.OPTIONAL)
-    private FreeMarkerTemplate failedSelectError;
+    @Inject
+    private Optional<FreeMarkerTemplate> failedSelectError;
 
-    @ConfigParam(name="beanId")
+    @Inject
+    @Named("beanId")
     private String beanId;
 
     private boolean executeBefore = true;
@@ -103,7 +104,7 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
 
     private BeanId beanIdObj;
 
-    @AppContext
+    @Inject
     private ApplicationContext appContext;
 
     public ResultsetRowSelector setResultSetName(String resultSetName) {
@@ -136,7 +137,7 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
 
     public ResultsetRowSelector setFailedSelectError(String failedSelectError) {
         AssertArgument.isNotNullAndNotEmpty(failedSelectError, "failedSelectError");
-        this.failedSelectError = new FreeMarkerTemplate(failedSelectError);
+        this.failedSelectError = Optional.of(new FreeMarkerTemplate(failedSelectError));
         return this;
     }
 
@@ -157,7 +158,7 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
         return config;
     }
 
-    @Initialize
+    @PostConstruct
     public void intitialize() throws SmooksConfigurationException {
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
@@ -172,13 +173,11 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
     public boolean consumes(Object object) {
         if(object.equals(resultSetName)) {
             return true;
-        } else if(whereEvaluator != null && whereEvaluator.getExpression().indexOf(object.toString()) != -1) {
+        } else if(whereEvaluator != null && whereEvaluator.getExpression().contains(object.toString())) {
             return true;
-        } else if(failedSelectError != null && failedSelectError.getTemplateText().indexOf(object.toString()) != -1) {
-            return true;
+        } else {
+            return failedSelectError != null && failedSelectError.isPresent() && failedSelectError.get().getTemplateText().contains(object.toString());
         }
-
-        return false;
     }
 
     public void visitBefore(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
@@ -234,8 +233,8 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
                     }
                 }
 
-                if(selectedRow == null && failedSelectError != null) {
-                    throw new DataSelectionException(failedSelectError.apply(beanRepository.getBeanMap()));
+                if(selectedRow == null && failedSelectError.isPresent()) {
+                    throw new DataSelectionException(failedSelectError.get().apply(beanRepository.getBeanMap()));
                 }
 
                 if(LOGGER.isDebugEnabled()) {
