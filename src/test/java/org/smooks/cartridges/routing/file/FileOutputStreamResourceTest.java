@@ -169,7 +169,7 @@ public class FileOutputStreamResourceTest
         try {
             smooks.setFilterSettings(FilterSettings.DEFAULT_SAX);
 
-            smooks.addVisitor(new Bean(HashMap.class, "object").bindTo("a", "a"));
+            smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
             smooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}").setUsage(OutputTo.stream("fileOS"))), "a");
             smooks.addVisitor(new FileOutputStreamResource().setFileNamePattern("${object.a}.xml").setDestinationDirectoryPattern("target/config-01-test/${object.a}").setResourceName("fileOS"), "a");
 
@@ -193,7 +193,7 @@ public class FileOutputStreamResourceTest
 
         try {
             smooks.setFilterSettings(FilterSettings.DEFAULT_SAX);
-            smooks.addVisitor(new Bean(HashMap.class, "object").bindTo("a", "a"));
+            smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
             smooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")
                     .setUsage(OutputTo.stream(outputStreamRef))), "a");
             smooks.addVisitor(new FileOutputStreamResource()
