@@ -113,7 +113,7 @@ public class ActiveMQTest {
 
     private void configure(Smooks smooks) {
         // Create a HashMap, name it "object" and then bind the <a> data into it, keyed as "a"...
-        smooks.addVisitor(new Bean(HashMap.class, "object").bindTo("a", "a"));
+        smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
 
         // On every <a> fragment, apply a simple template and bind the templating result to
         // beanId "orderItem_xml" ...
