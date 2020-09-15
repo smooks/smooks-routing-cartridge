@@ -98,7 +98,7 @@
 			    		</xs:documentation>
 			    	</xs:annotation>
    				</xs:attribute>
-    			<xs:attribute name="executeBefore" type="xs:boolean" use="optional" default="false">
+    			<xs:attribute name="executeBefore" type="xs:boolean" default="false">
    					<xs:annotation>
 			    		<xs:documentation xml:lang="en">
 							If the routing is done before or after the selected element. Default is 'false'.
