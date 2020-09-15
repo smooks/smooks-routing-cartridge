@@ -45,8 +45,6 @@ package org.smooks.cartridges.routing.db;
 import org.smooks.SmooksException;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.SmooksResourceConfigurationFactory;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.db.AbstractDataSource;
@@ -80,11 +78,11 @@ import java.util.*;
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
 @SuppressWarnings("unchecked")
-@VisitBeforeIf(	condition = "parameters.containsKey('executeBefore') && parameters.executeBefore.value == 'true'")
-@VisitAfterIf(	condition = "!parameters.containsKey('executeBefore') || parameters.executeBefore.value != 'true'")
+@VisitBeforeIf(condition = "executeBefore")
+@VisitAfterIf(condition = "!executeBefore")
 @VisitBeforeReport(summary = "Execute statement '${resource.parameters.statement}' on Datasource '${resource.parameters.datasource}'.", detailTemplate = "reporting/SQLExecutor.html")
 @VisitAfterReport(summary = "Execute statement '${resource.parameters.statement}' on Datasource '${resource.parameters.datasource}'.", detailTemplate = "reporting/SQLExecutor.html")
-public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisitBefore, SAXVisitAfter, DOMElementVisitor, Producer, Consumer {
+public class SQLExecutor implements SAXVisitBefore, SAXVisitAfter, DOMElementVisitor, Producer, Consumer {
 
     @Inject
     private String datasource;
@@ -103,7 +101,8 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
     @Inject
     private Long resultSetTTL = 900000L;
 
-    private boolean executeBefore = false;
+    @Inject
+    private Boolean executeBefore = false;
 
     @Inject
     private ApplicationContext appContext;
@@ -148,27 +147,25 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
         return this;
     }
 
-    public SmooksResourceConfiguration createConfiguration() {
-        SmooksResourceConfiguration config = new SmooksResourceConfiguration();
-        config.setParameter("executeBefore", Boolean.toString(executeBefore));
-        return config;
+    public boolean getExecuteBefore() {
+        return executeBefore;
     }
 
     @PostConstruct
-    public void intitialize() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigurationException {
         statementExec = new StatementExec(statement);
-        if(statementExec.getStatementType() == StatementType.QUERY && !resultSetName.isPresent()) {
+        if (statementExec.getStatementType() == StatementType.QUERY && !resultSetName.isPresent()) {
             throw new SmooksConfigurationException("Sorry, query statements must be accompanied by a 'resultSetName' property, under whose value the query results are bound.");
         }
 
-        if(resultSetName.isPresent()) {
-	        resultSetBeanId = appContext.getBeanIdStore().register(resultSetName.get());
+        if (resultSetName.isPresent()) {
+            resultSetBeanId = appContext.getBeanIdStore().register(resultSetName.get());
         }
         rsAppContextKey = datasource + ":" + statement;
     }
 
     public Set<?> getProducts() {
-        if(statementExec.getStatementType() == StatementType.QUERY) {
+        if (statementExec.getStatementType() == StatementType.QUERY) {
             return CollectionsUtil.toSet(resultSetName);
         }
 
@@ -179,36 +176,33 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
         return statement.contains(object.toString());
     }
 
-    public void visitBefore(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException
-    {
-            executeSQL(executionContext, new Fragment(saxElement));
-        }
+    public void visitBefore(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException {
+        executeSQL(executionContext, new Fragment(saxElement));
+    }
 
-    public void visitAfter(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException
-    {
-            executeSQL(executionContext, new Fragment(saxElement));
-        }
+    public void visitAfter(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException {
+        executeSQL(executionContext, new Fragment(saxElement));
+    }
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-            executeSQL(executionContext, new Fragment(element));
-        }
+        executeSQL(executionContext, new Fragment(element));
+    }
 
     public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-            executeSQL(executionContext, new Fragment(element));
-        }
+        executeSQL(executionContext, new Fragment(element));
+    }
 
 
-
-	private void executeSQL(ExecutionContext executionContext, Fragment source) throws SmooksException {
+    private void executeSQL(ExecutionContext executionContext, Fragment source) throws SmooksException {
         Connection connection = AbstractDataSource.getConnection(datasource, executionContext);
         BeanContext beanContext = executionContext.getBeanContext();
 
         Map<String, Object> beanMap = beanContext.getBeanMap();
 
         try {
-            if(!statementExec.isJoin()) {
-                if(statementExec.getStatementType() == StatementType.QUERY) {
-                    if(resultSetScope == ResultSetScope.EXECUTION) {
+            if (!statementExec.isJoin()) {
+                if (statementExec.getStatementType() == StatementType.QUERY) {
+                    if (resultSetScope == ResultSetScope.EXECUTION) {
                         beanContext.addBean(resultSetBeanId, statementExec.executeUnjoinedQuery(connection), source);
                     } else {
                         List<Map<String, Object>> resultMap;
@@ -216,9 +210,9 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
                         ApplicationContext appContext = executionContext.getApplicationContext();
                         ResultSetContextObject rsContextObj = ResultSetContextObject.getInstance(rsAppContextKey, appContext);
 
-                        if(rsContextObj.hasExpired()) {
+                        if (rsContextObj.hasExpired()) {
                             synchronized (rsContextObj) {
-                                if(rsContextObj.hasExpired()) {
+                                if (rsContextObj.hasExpired()) {
                                     rsContextObj.resultSet = statementExec.executeUnjoinedQuery(connection);
                                     rsContextObj.expiresAt = System.currentTimeMillis() + resultSetTTL;
                                 }
@@ -231,21 +225,21 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
                     statementExec.executeUnjoinedUpdate(connection);
                 }
             } else {
-                if(statementExec.getStatementType() == StatementType.QUERY) {
+                if (statementExec.getStatementType() == StatementType.QUERY) {
                     List<Map<String, Object>> resultMap = new ArrayList<Map<String, Object>>();
                     statementExec.executeJoinedQuery(connection, beanMap, resultMap);
                     beanContext.addBean(resultSetBeanId, resultMap, source);
                 } else {
-                    if(resultSetBeanId == null) {
+                    if (resultSetBeanId == null) {
                         statementExec.executeJoinedUpdate(connection, beanMap);
                     } else {
                         Object resultSetObj = beanContext.getBean(resultSetBeanId);
-                        if(resultSetObj != null) {
+                        if (resultSetObj != null) {
                             try {
-                            	@SuppressWarnings("unchecked")
+                                @SuppressWarnings("unchecked")
                                 List<Map<String, Object>> resultSet = (List<Map<String, Object>>) resultSetObj;
                                 statementExec.executeJoinedStatement(connection, resultSet);
-                            } catch(ClassCastException e) {
+                            } catch (ClassCastException e) {
                                 throw new SmooksException("Cannot execute joined statement '" + statementExec.getStatement() + "' on ResultSet '" + resultSetName + "'.  Must be of type 'List<Map<String, Object>>'.  Is of type '" + resultSetObj.getClass().getName() + "'.");
                             }
                         } else {
@@ -270,10 +264,10 @@ public class SQLExecutor implements SmooksResourceConfigurationFactory, SAXVisit
         private static ResultSetContextObject getInstance(String rsAppContextKey, ApplicationContext appContext) {
             ResultSetContextObject rsContextObj = (ResultSetContextObject) appContext.getRegistry().lookup(rsAppContextKey);
 
-            if(rsContextObj == null) {
+            if (rsContextObj == null) {
                 synchronized (appContext) {
                     rsContextObj = (ResultSetContextObject) appContext.getRegistry().lookup(rsAppContextKey);
-                    if(rsContextObj == null) {
+                    if (rsContextObj == null) {
                         rsContextObj = new ResultSetContextObject();
                         appContext.getRegistry().registerObject(rsAppContextKey, rsContextObj);
                     }

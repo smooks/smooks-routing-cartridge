@@ -47,8 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.SmooksResourceConfigurationFactory;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
@@ -78,9 +76,9 @@ import java.util.*;
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
-@VisitBeforeIf(	condition = "!parameters.containsKey('executeBefore') || parameters.executeBefore.value == 'true'")
-@VisitAfterIf(	condition = "parameters.containsKey('executeBefore') && parameters.executeBefore.value != 'true'")
-public class ResultsetRowSelector implements SmooksResourceConfigurationFactory, SAXVisitBefore, SAXVisitAfter, DOMElementVisitor, Producer, Consumer {
+@VisitBeforeIf(condition = "executeBefore")
+@VisitAfterIf(condition = "!executeBefore")
+public class ResultsetRowSelector implements SAXVisitBefore, SAXVisitAfter, DOMElementVisitor, Producer, Consumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultsetRowSelector.class);
 
@@ -98,7 +96,8 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
     @Named("beanId")
     private String beanId;
 
-    private boolean executeBefore = true;
+    @Inject
+    private Boolean executeBefore = true;
 
     private BeanId resultSetBeanId;
 
@@ -152,14 +151,12 @@ public class ResultsetRowSelector implements SmooksResourceConfigurationFactory,
         return this;
     }
 
-    public SmooksResourceConfiguration createConfiguration() {
-        SmooksResourceConfiguration config = new SmooksResourceConfiguration();
-        config.setParameter("executeBefore", Boolean.toString(executeBefore));
-        return config;
+    public boolean getExecuteBefore() {
+        return executeBefore;
     }
-
+    
     @PostConstruct
-    public void intitialize() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigurationException {
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
     	beanIdObj = beanIdStore.register(beanId);
