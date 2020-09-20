@@ -56,7 +56,7 @@ import org.smooks.javabean.lifecycle.BeanLifecycle;
 import org.smooks.javabean.repository.BeanId;
 import org.smooks.namespace.NamespaceDeclarationStack;
 import org.smooks.util.CollectionsUtil;
-import org.smooks.xml.NamespaceMappings;
+import org.smooks.xml.NamespaceManager;
 import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
@@ -256,7 +256,7 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
 		}		
 
         private void addRootNamespaces(SAXElement element, ExecutionContext executionContext) {
-            NamespaceDeclarationStack nsDeclStack = NamespaceMappings.getNamespaceDeclarationStack(executionContext);
+            NamespaceDeclarationStack nsDeclStack = NamespaceManager.getNamespaceDeclarationStack(executionContext);
             Map<String, String> rootNamespaces = nsDeclStack.getActiveNamespaces();
 
             if (!rootNamespaces.isEmpty()) {

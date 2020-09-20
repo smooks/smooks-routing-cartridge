@@ -42,9 +42,9 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd" xmlns:envelope="http://schemas.xmlsoap.org/soap/envelope/">
 
-    <resource-config selector="Body" selector-namespace="http://schemas.xmlsoap.org/soap/envelope/">
+    <resource-config selector="envelope:Body">
         <resource>org.smooks.cartridges.routing.basic.FragmentSerializer</resource>
         <param name="bindTo">soapBody</param>
         <param name="childContentOnly">true</param>

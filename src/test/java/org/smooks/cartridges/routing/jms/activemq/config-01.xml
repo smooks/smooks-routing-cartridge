@@ -42,10 +42,10 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
-                      xmlns:jms="https://www.smooks.org/xsd/smooks/jms-routing-1.3.xsd"
-                      xmlns:ftl="https://www.smooks.org/xsd/smooks/freemarker-1.2.xsd">
+                      xmlns:jms="https://www.smooks.org/xsd/smooks/jms-routing-2.0.xsd"
+                      xmlns:ftl="https://www.smooks.org/xsd/smooks/freemarker-2.0.xsd">
     
     <jb:bean beanId="object" class="java.util.HashMap" createOnElement="a">
         <jb:value property="a" data="a" />

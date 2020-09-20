@@ -42,49 +42,76 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd" default-selector-namespace="https://www.smooks.org/xsd/smooks/io-routing-1.2.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd" 
+                      xmlns:file="https://www.smooks.org/xsd/smooks/file-routing-2.0.xsd">
 
     <!--
         FileOutputStreamResource Resource
     -->
 
-    <resource-config selector="router">
+    <resource-config selector="file:outputStream">
         <resource>org.smooks.cdr.extension.NewResourceConfig</resource>
-        <param name="resource">org.smooks.cartridges.routing.io.OutputStreamRouter</param>
+        <param name="resource">org.smooks.cartridges.routing.file.FileOutputStreamResource</param>
     </resource-config>
 
-	<resource-config selector="router">
+    <resource-config selector="file:outputStream">
         <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">routeOnElement</param>
+        <param name="attribute">openOnElement</param>
         <param name="mapTo">selector</param>
     </resource-config>
-
-	<resource-config selector="router">
-        <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">routeOnElementNS</param>
-        <param name="mapTo">selector-namespace</param>
-    </resource-config>
-
-    <resource-config selector="router">
+    
+    <resource-config selector="file:outputStream">
         <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">resourceName</param>
     </resource-config>
 
-	<resource-config selector="router">
-        <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">beanId</param>
-    </resource-config>
-
-   	<resource-config selector="router">
+    <resource-config selector="file:outputStream">
         <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">encoding</param>
         <param name="mapTo">writerEncoding</param>
     </resource-config>
 
-	<resource-config selector="router">
+	<resource-config selector="file:outputStream/fileNamePattern">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">fileNamePattern</param>
+    </resource-config>
+
+    <resource-config selector="file:outputStream/destinationDirectoryPattern">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">destinationDirectoryPattern</param>
+    </resource-config>
+
+    <resource-config selector="file:outputStream/listFileNamePattern">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">listFileNamePattern</param>
+    </resource-config>
+
+    <resource-config selector="file:outputStream/highWaterMark">
         <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">executeBefore</param>
-        <param name="mapTo">visitBefore</param>
+        <param name="attribute">mark</param>
+        <param name="mapTo">highWaterMark</param>
+    </resource-config>
+
+    <resource-config selector="file:outputStream/highWaterMark">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
+        <param name="attribute">timeout</param>
+        <param name="mapTo">highWaterMarkTimeout</param>
+    </resource-config>
+
+    <resource-config selector="file:outputStream/highWaterMark">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
+        <param name="attribute">pollFrequency</param>
+        <param name="mapTo">highWaterMarkPollFrequency</param>
+    </resource-config>
+
+    <resource-config selector="file:outputStream/closeOnCondition">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">closeOnCondition</param>
+    </resource-config>
+    
+    <resource-config selector="file:outputStream/append">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromText</resource>
+        <param name="mapTo">append</param>
     </resource-config>
 
 </smooks-resource-list>

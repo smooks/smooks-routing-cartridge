@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="https://www.smooks.org/xsd/smooks/db-routing-1.2.xsd"
+<xs:schema targetNamespace="https://www.smooks.org/xsd/smooks/db-routing-2.0.xsd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd"
-           xmlns:smooks-db-routing="https://www.smooks.org/xsd/smooks/db-routing-1.2.xsd">
+           xmlns:smooks="https://www.smooks.org/xsd/smooks-2.0.xsd"
+           xmlns:db="https://www.smooks.org/xsd/smooks/db-routing-2.0.xsd">
 
-    <xs:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
+    <xs:import namespace="https://www.smooks.org/xsd/smooks-2.0.xsd"/>
 
     <xs:annotation>
         <xs:documentation xml:lang="en">Smooks SQL Routing Configuration</xs:documentation>
     </xs:annotation>
 
 
-    <xs:element name="executor" type="smooks-db-routing:executor" substitutionGroup="smooks:abstract-resource-config" >
+    <xs:element name="executor" type="db:executor" substitutionGroup="smooks:abstract-resource-config" >
     	<xs:annotation>
     		<xs:documentation xml:lang="en">
     			SQL Executor configuration
@@ -40,7 +40,7 @@
 				    		</xs:documentation>
 				    	</xs:annotation>
     				</xs:element>
-    				<xs:element name="resultSet" type="smooks-db-routing:resultSet"  minOccurs="0" maxOccurs="1" >
+    				<xs:element name="resultSet" type="db:resultSet"  minOccurs="0" maxOccurs="1" >
     					<xs:annotation>
 				    		<xs:documentation xml:lang="en">
 				    			Sets the resultSet specific configuration like the resultSet name, scope and timeToLive.
@@ -53,13 +53,6 @@
 			    		<xs:documentation xml:lang="en">
 			    			The element on which the query is executed. With the 'executeBefore'
 			    			attribute can be set if the query is executed before or after the element.
-			    		</xs:documentation>
-			    	</xs:annotation>
-    			</xs:attribute>
-    			<xs:attribute name="executeOnElementNS" type="xs:string" use="optional" >
-    				<xs:annotation>
-			    		<xs:documentation xml:lang="en">
-			    			The namespace of the executeOnElement element.
 			    		</xs:documentation>
 			    	</xs:annotation>
     			</xs:attribute>
@@ -83,7 +76,7 @@
     	</xs:complexContent>
     </xs:complexType>
 
-	<xs:element name="resultSetRowSelector" type="smooks-db-routing:resultSetRowSelector" substitutionGroup="smooks:abstract-resource-config" >
+	<xs:element name="resultSetRowSelector" type="db:resultSetRowSelector" substitutionGroup="smooks:abstract-resource-config" >
 		<xs:annotation>
     		<xs:documentation xml:lang="en">
     			ResultSet Row Selector configuration
@@ -168,7 +161,7 @@
     			</xs:documentation>
     		</xs:annotation>
     	</xs:attribute>
-		<xs:attribute name="scope" type="smooks-db-routing:resultSetScopeType" default="EXECUTION">
+		<xs:attribute name="scope" type="db:resultSetScopeType" default="EXECUTION">
 			<xs:annotation>
     			<xs:documentation xml:lang="en">
     				The scope on which the resultSet will be stored. The scope can be on a EXECUTION or
