@@ -42,7 +42,7 @@
   =========================LICENSE_END==================================
   -->
 
-<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd" xmlns:frag="https://www.smooks.org/xsd/smooks/fragment-routing-1.5.xsd">
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd" xmlns:frag="https://www.smooks.org/xsd/smooks/fragment-routing-1.5.xsd">
 
 	<frag:serialize fragment="Body" bindTo="soapBody" childContentOnly="true" omitXMLDeclaration="true" retain="true"/>
 
