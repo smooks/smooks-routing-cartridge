@@ -42,25 +42,24 @@
  */
 package org.smooks.cartridges.routing.file;
 
-import org.smooks.FilterSettings;
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.templating.OutputTo;
 import org.smooks.cartridges.templating.TemplatingConfiguration;
 import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.injector.Scope;
-import org.smooks.cdr.lifecycle.LifecycleManager;
-import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.cdr.registry.Registry;
-import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.container.MockExecutionContext;
 import org.smooks.delivery.Fragment;
+import org.smooks.injector.Scope;
 import org.smooks.io.AbstractOutputStreamResource;
 import org.smooks.io.FileUtils;
+import org.smooks.lifecycle.LifecycleManager;
+import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
 import org.smooks.payload.StringSource;
+import org.smooks.registry.Registry;
+import org.smooks.registry.lookup.LifecycleManagerLookup;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -81,72 +80,65 @@ import static org.testng.AssertJUnit.*;
  * 
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>
  */
-@Test ( groups = "unit" )
-public class FileOutputStreamResourceTest 
-{
-	private String resourceName = "testResourceName";
-	private String fileNamePattern = "testFileName";
-	private String destinationDirectory = System.getProperty( "java.io.tmpdir" );
-	private String listFileName = "testListFileName";
-	private FileOutputStreamResource resource = new FileOutputStreamResource();
-	private SmooksResourceConfiguration config;
-    private File file1 = new File("target/config-01-test/1/1.xml");
-    private File file2 = new File("target/config-01-test/2/2.xml");
-    private File file3 = new File("target/config-01-test/3/3.xml");
-	
+@Test(groups = "unit")
+public class FileOutputStreamResourceTest {
+    private final String resourceName = "testResourceName";
+    private final String fileNamePattern = "testFileName";
+    private final String destinationDirectory = System.getProperty("java.io.tmpdir");
+    private final FileOutputStreamResource resource = new FileOutputStreamResource();
+    private final File file1 = new File("target/config-01-test/1/1.xml");
+    private final File file2 = new File("target/config-01-test/2/2.xml");
+    private final File file3 = new File("target/config-01-test/3/3.xml");
+
     @BeforeClass
     public void setUp() throws Exception {
         Registry registry = new MockApplicationContext().getRegistry();
         LifecycleManager lifecycleManager = registry.lookup(new LifecycleManagerLookup());
-        config = createConfig( resourceName, fileNamePattern, destinationDirectory, listFileName);
+        String listFileName = "testListFileName";
+        SmooksResourceConfiguration config = createConfig(resourceName, fileNamePattern, destinationDirectory, listFileName);
         lifecycleManager.applyPhase(resource, new PostConstructLifecyclePhase(new Scope(registry, config, resource)));
         deleteFiles();
     }
 
     @Test
-	public void configure()
-	{
-        assertEquals(resourceName, resource.getResourceName() );
-	}
-	
-	@Test
-	public void visit() throws Exception
-	{
-		MockExecutionContext executionContext = new MockExecutionContext();
-		resource.visitBefore((Element)null, executionContext );
-		
-		OutputStream outputStream = AbstractOutputStreamResource.getOutputStream(resource.getResourceName(), executionContext );
-		assertTrue(outputStream instanceof FileOutputStream );
-		
-		resource.executeVisitLifecycleCleanup(new Fragment((Element)null), executionContext);
-		
-		assertThatFilesWereGenerated(executionContext);
-	}
-	
-	private void assertThatFilesWereGenerated(ExecutionContext executionContext) throws Exception
-	{
-	    File file = new File ( destinationDirectory, fileNamePattern );
-        assertTrue( file.exists() );
-        
-        List<String> listFileNames = FileListAccessor.getListFileNames( executionContext );
-        assertNotNull( listFileNames );
-        assertTrue( listFileNames.size() == 1 );
-        
-        for (String listFile : listFileNames)
-        {
-            List<String> fileList = FileListAccessor.getFileList( executionContext, listFile );
-            assertTrue( fileList.size() == 1 );
-            for (String fileName : fileList)
-            {
-                File file2 = new File( fileName );
-                assertEquals( fileNamePattern, file2.getName() );
+    public void configure() {
+        assertEquals(resourceName, resource.getResourceName());
+    }
+
+    @Test
+    public void visit() throws Exception {
+        MockExecutionContext executionContext = new MockExecutionContext();
+        resource.visitBefore((Element) null, executionContext);
+
+        OutputStream outputStream = AbstractOutputStreamResource.getOutputStream(resource.getResourceName(), executionContext);
+        assertTrue(outputStream instanceof FileOutputStream);
+
+        resource.executeVisitLifecycleCleanup(new Fragment((Element) null), executionContext);
+
+        assertThatFilesWereGenerated(executionContext);
+    }
+
+    private void assertThatFilesWereGenerated(ExecutionContext executionContext) throws Exception {
+        File file = new File(destinationDirectory, fileNamePattern);
+        assertTrue(file.exists());
+
+        List<String> listFileNames = FileListAccessor.getListFileNames(executionContext);
+        assertNotNull(listFileNames);
+        assertTrue(listFileNames.size() == 1);
+
+        for (String listFile : listFileNames) {
+            List<String> fileList = FileListAccessor.getFileList(executionContext, listFile);
+            assertTrue(fileList.size() == 1);
+            for (String fileName : fileList) {
+                File file2 = new File(fileName);
+                assertEquals(fileNamePattern, file2.getName());
                 file2.delete();
             }
-            new File( listFile ).delete();
+            new File(listFile).delete();
         }
-	    
-	}
-    
+
+    }
+
     @Test
     public void testConfig01() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("config-01.xml"));
@@ -167,8 +159,6 @@ public class FileOutputStreamResourceTest
         Smooks smooks = new Smooks();
 
         try {
-            smooks.setFilterSettings(FilterSettings.DEFAULT_SAX);
-
             smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
             smooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}").setUsage(OutputTo.stream("fileOS"))), "a");
             smooks.addVisitor(new FileOutputStreamResource().setFileNamePattern("${object.a}.xml").setDestinationDirectoryPattern("target/config-01-test/${object.a}").setResourceName("fileOS"), "a");
@@ -182,26 +172,24 @@ public class FileOutputStreamResourceTest
             smooks.close();
         }
     }
-    
+
     @Test
     public void testAppendingToOutputFile() throws Exception {
         final Smooks smooks = new Smooks();
         final String outputFileName = "appended.txt";
         final String outputStreamRef = "fileOS";
         final File destinationDir = new File("target/config-01-test");
-	    final File outputFile = new File(destinationDir, outputFileName);
+        final File outputFile = new File(destinationDir, outputFileName);
 
         try {
-            smooks.setFilterSettings(FilterSettings.DEFAULT_SAX);
             smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
             smooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")
                     .setUsage(OutputTo.stream(outputStreamRef))), "a");
             smooks.addVisitor(new FileOutputStreamResource()
-                    .setAppend(true)
-                    .setFileNamePattern(outputFileName)
-                    .setDestinationDirectoryPattern(destinationDir.getAbsolutePath())
-                    .setResourceName(outputStreamRef)
-                    , "a");
+                            .setAppend(true)
+                            .setFileNamePattern(outputFileName)
+                            .setDestinationDirectoryPattern(destinationDir.getAbsolutePath())
+                            .setResourceName(outputStreamRef), "a");
 
             smooks.filterSource(new StringSource("<root><a>1</a><a>2</a><a>3</a></root>"));
 
@@ -227,19 +215,17 @@ public class FileOutputStreamResourceTest
         file3.delete();
     }
 
-	private SmooksResourceConfiguration createConfig( 
-			final String resourceName, 
-			final String fileName ,
-			final String destinationDirectory ,
-			final String listFileName )
-	{
-    	SmooksResourceConfiguration config = new SmooksResourceConfiguration( "x", FileOutputStreamResource.class.getName() );
-		config.setParameter( "resourceName", resourceName );
-		config.setParameter( "fileNamePattern", fileName );
-		config.setParameter( "destinationDirectoryPattern", destinationDirectory );
-		config.setParameter( "listFileNamePattern", listFileName );
-		return config;
-	}
-	
+    private SmooksResourceConfiguration createConfig(
+            final String resourceName,
+            final String fileName,
+            final String destinationDirectory,
+            final String listFileName) {
+        SmooksResourceConfiguration config = new SmooksResourceConfiguration("x", FileOutputStreamResource.class.getName());
+        config.setParameter("resourceName", resourceName);
+        config.setParameter("fileNamePattern", fileName);
+        config.setParameter("destinationDirectoryPattern", destinationDirectory);
+        config.setParameter("listFileNamePattern", listFileName);
+        return config;
+    }
 }
 	

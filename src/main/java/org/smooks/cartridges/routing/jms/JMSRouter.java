@@ -54,11 +54,9 @@ import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.util.FreeMarkerTemplate;
 import org.smooks.util.FreeMarkerUtils;
 import org.w3c.dom.Element;
@@ -70,7 +68,6 @@ import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Optional;
@@ -138,7 +135,7 @@ import java.util.Properties;
  */
 @VisitBeforeIf(condition = "executeBefore")
 @VisitAfterIf(condition = "!executeBefore")
-public class JMSRouter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer {
+public class JMSRouter implements BeforeVisitor, AfterVisitor, Consumer {
     /*
      *	Log instance
      */
@@ -246,17 +243,13 @@ public class JMSRouter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAft
     }
 
     @PreDestroy
-    public void uninitialize() throws JMSException {
+    public void preDestroy() throws JMSException {
         releaseJMSResources();
     }
 
     public boolean consumes(Object object) {
-        if (object.toString().startsWith(beanId)) {
-            // We use startsWith (Vs equals) so as to catch bean populations e.g. "address.street".
-            return true;
-        }
-
-        return false;
+        // We use startsWith (Vs equals) so as to catch bean populations e.g. "address.street".
+        return object.toString().startsWith(beanId);
     }
 
     public void setBeanId(String beanId) {
@@ -361,21 +354,14 @@ public class JMSRouter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAft
         return executeBefore;
     }
 
-    //	Vistor methods
 
+    @Override
     public void visitAfter(final Element element, final ExecutionContext execContext) throws SmooksException {
         visit(execContext);
     }
 
+    @Override
     public void visitBefore(final Element element, final ExecutionContext execContext) throws SmooksException {
-        visit(execContext);
-    }
-
-    public void visitAfter(final SAXElement element, final ExecutionContext execContext) throws SmooksException, IOException {
-        visit(execContext);
-    }
-
-    public void visitBefore(final SAXElement element, final ExecutionContext execContext) throws SmooksException, IOException {
         visit(execContext);
     }
 

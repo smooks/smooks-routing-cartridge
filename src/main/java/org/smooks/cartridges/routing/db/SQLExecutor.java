@@ -51,12 +51,10 @@ import org.smooks.db.AbstractDataSource;
 import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.event.report.annotation.VisitAfterReport;
 import org.smooks.event.report.annotation.VisitBeforeReport;
 import org.smooks.javabean.context.BeanContext;
@@ -82,7 +80,7 @@ import java.util.*;
 @VisitAfterIf(condition = "!executeBefore")
 @VisitBeforeReport(summary = "Execute statement '${resource.parameters.statement}' on Datasource '${resource.parameters.datasource}'.", detailTemplate = "reporting/SQLExecutor.html")
 @VisitAfterReport(summary = "Execute statement '${resource.parameters.statement}' on Datasource '${resource.parameters.datasource}'.", detailTemplate = "reporting/SQLExecutor.html")
-public class SQLExecutor implements SAXVisitBefore, SAXVisitAfter, DOMElementVisitor, Producer, Consumer {
+public class SQLExecutor implements BeforeVisitor, AfterVisitor, Producer, Consumer {
 
     @Inject
     private String datasource;
@@ -176,22 +174,15 @@ public class SQLExecutor implements SAXVisitBefore, SAXVisitAfter, DOMElementVis
         return statement.contains(object.toString());
     }
 
-    public void visitBefore(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException {
-        executeSQL(executionContext, new Fragment(saxElement));
-    }
-
-    public void visitAfter(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException {
-        executeSQL(executionContext, new Fragment(saxElement));
-    }
-
+    @Override
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         executeSQL(executionContext, new Fragment(element));
     }
 
+    @Override
     public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
         executeSQL(executionContext, new Fragment(element));
     }
-
 
     private void executeSQL(ExecutionContext executionContext, Fragment source) throws SmooksException {
         Connection connection = AbstractDataSource.getConnection(datasource, executionContext);

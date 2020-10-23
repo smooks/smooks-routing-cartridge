@@ -49,11 +49,9 @@ import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.io.AbstractOutputStreamResource;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.repository.BeanId;
@@ -94,7 +92,7 @@ import java.io.OutputStream;
  */
 @VisitAfterIf(	condition = "!parameters.containsKey('visitBefore') || parameters.visitBefore.value != 'true'")
 @VisitBeforeIf(	condition = "!parameters.containsKey('visitAfter') || parameters.visitAfter.value != 'true'")
-public class OutputStreamRouter implements DOMElementVisitor, SAXVisitBefore, SAXVisitAfter, Consumer
+public class OutputStreamRouter implements BeforeVisitor, AfterVisitor, Consumer
 {
 	@Inject
 	private String resourceName;
@@ -134,25 +132,16 @@ public class OutputStreamRouter implements DOMElementVisitor, SAXVisitBefore, SA
 
         return false;
     }
+    
 
-    public void visitBefore( Element element, ExecutionContext executionContext ) throws SmooksException
-	{
-		write( executionContext );
+    @Override
+	public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
+		write(executionContext);
 	}
 
-	public void visitAfter( Element element, ExecutionContext executionContext ) throws SmooksException
-	{
-		write( executionContext );
-	}
-
-	public void visitBefore( SAXElement element, ExecutionContext executionContext ) throws SmooksException, IOException
-	{
-		write( executionContext );
-	}
-
-	public void visitAfter( SAXElement element, ExecutionContext executionContext ) throws SmooksException, IOException
-	{
-		write( executionContext );
+	@Override
+	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
+		write(executionContext);
 	}
 
 	public String getResourceName()

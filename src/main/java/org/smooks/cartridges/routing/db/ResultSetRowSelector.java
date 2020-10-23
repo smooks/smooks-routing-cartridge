@@ -52,12 +52,10 @@ import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.dom.DOMElementVisitor;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
-import org.smooks.delivery.sax.SAXVisitBefore;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.expression.ExpressionEvaluator;
 import org.smooks.expression.MVELExpressionEvaluator;
 import org.smooks.javabean.context.BeanContext;
@@ -70,7 +68,6 @@ import org.w3c.dom.Element;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -78,9 +75,9 @@ import java.util.*;
  */
 @VisitBeforeIf(condition = "executeBefore")
 @VisitAfterIf(condition = "!executeBefore")
-public class ResultsetRowSelector implements SAXVisitBefore, SAXVisitAfter, DOMElementVisitor, Producer, Consumer {
+public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Producer, Consumer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResultsetRowSelector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResultSetRowSelector.class);
 
     @Inject
     private String resultSetName;
@@ -106,13 +103,13 @@ public class ResultsetRowSelector implements SAXVisitBefore, SAXVisitAfter, DOME
     @Inject
     private ApplicationContext appContext;
 
-    public ResultsetRowSelector setResultSetName(String resultSetName) {
+    public ResultSetRowSelector setResultSetName(String resultSetName) {
         AssertArgument.isNotNullAndNotEmpty(resultSetName, "resultSetName");
         this.resultSetName = resultSetName;
         return this;
     }
 
-    public ResultsetRowSelector setSelector(SQLExecutor executor) {
+    public ResultSetRowSelector setSelector(SQLExecutor executor) {
         AssertArgument.isNotNull(executor, "executor");
         this.resultSetName = executor.getResultSetName();
         if(this.resultSetName == null) {
@@ -121,32 +118,32 @@ public class ResultsetRowSelector implements SAXVisitBefore, SAXVisitAfter, DOME
         return this;
     }
 
-    public ResultsetRowSelector setWhereClause(String whereClause) {
+    public ResultSetRowSelector setWhereClause(String whereClause) {
         AssertArgument.isNotNullAndNotEmpty(whereClause, "whereClause");
         this.whereEvaluator = new MVELExpressionEvaluator();
         this.whereEvaluator.setExpression(whereClause);
         return this;
     }
 
-    public ResultsetRowSelector setWhereEvaluator(ExpressionEvaluator whereEvaluator) {
+    public ResultSetRowSelector setWhereEvaluator(ExpressionEvaluator whereEvaluator) {
         AssertArgument.isNotNull(whereEvaluator, "whereEvaluator");
         this.whereEvaluator = whereEvaluator;
         return this;
     }
 
-    public ResultsetRowSelector setFailedSelectError(String failedSelectError) {
+    public ResultSetRowSelector setFailedSelectError(String failedSelectError) {
         AssertArgument.isNotNullAndNotEmpty(failedSelectError, "failedSelectError");
         this.failedSelectError = Optional.of(new FreeMarkerTemplate(failedSelectError));
         return this;
     }
 
-    public ResultsetRowSelector setBeanId(String beanId) {
+    public ResultSetRowSelector setBeanId(String beanId) {
         AssertArgument.isNotNullAndNotEmpty(beanId, "beanId");
         this.beanId = beanId;
         return this;
     }
 
-    public ResultsetRowSelector setExecuteBefore(boolean executeBefore) {
+    public ResultSetRowSelector setExecuteBefore(boolean executeBefore) {
         this.executeBefore = executeBefore;
         return this;
     }
@@ -177,34 +174,20 @@ public class ResultsetRowSelector implements SAXVisitBefore, SAXVisitAfter, DOME
         }
     }
 
-    public void visitBefore(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+    @Override
+    public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         selectRow(executionContext, new Fragment(element));
     }
 
-    public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+    @Override
+    public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
         selectRow(executionContext, new Fragment(element));
     }
-
-    /* (non-Javadoc)
-	 * @see org.smooks.delivery.dom.DOMVisitBefore#visitBefore(org.w3c.dom.Element, org.smooks.container.ExecutionContext)
-	 */
-	public void visitBefore(Element element, ExecutionContext executionContext)
-			throws SmooksException {
-		selectRow(executionContext, new Fragment(element));
-	}
-
-    /* (non-Javadoc)
-	 * @see org.smooks.delivery.dom.DOMVisitAfter#visitAfter(org.w3c.dom.Element, org.smooks.container.ExecutionContext)
-	 */
-	public void visitAfter(Element element, ExecutionContext executionContext)
-			throws SmooksException {
-		selectRow(executionContext, new Fragment(element));
-	}
-
+    
     private void selectRow(ExecutionContext executionContext, Fragment source) throws SmooksException {
     	BeanContext beanRepository = executionContext.getBeanContext();
 
-    	Map<String, Object> beanMapClone = new HashMap<String, Object>(beanRepository.getBeanMap());
+    	Map<String, Object> beanMapClone = new HashMap<>(beanRepository.getBeanMap());
 
         // Lookup the new current value for the bean...
         try {

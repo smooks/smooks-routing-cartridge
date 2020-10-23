@@ -98,7 +98,7 @@
     -->
 	<resource-config selector="db:resultSetRowSelector">
         <resource>org.smooks.cdr.extension.NewResourceConfig</resource>
-        <param name="resource">org.smooks.cartridges.routing.db.ResultsetRowSelector</param>
+        <param name="resource">org.smooks.cartridges.routing.db.ResultSetRowSelector</param>
     </resource-config>
 
     <resource-config selector="db:resultSetRowSelector">

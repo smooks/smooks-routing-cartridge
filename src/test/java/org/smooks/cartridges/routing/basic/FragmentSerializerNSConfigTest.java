@@ -42,14 +42,12 @@
  */
 package org.smooks.cartridges.routing.basic;
 
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
-
-import org.smooks.FilterSettings;
 import org.smooks.Smooks;
 import org.smooks.payload.JavaResult;
 import org.xml.sax.SAXException;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.custommonkey.xmlunit.XMLAssert;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
@@ -60,23 +58,13 @@ import java.io.StringReader;
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
 public class FragmentSerializerNSConfigTest {
-
+    
     @Test
-    public void test_children_only_SAX() throws IOException, SAXException {
-    	test_children_only(FilterSettings.DEFAULT_SAX);
-    }
-
-    @Test
-    public void test_children_only_DOM() throws IOException, SAXException {
-    	test_children_only(FilterSettings.DEFAULT_DOM);
-    }
-
-    private void test_children_only(FilterSettings filterSettings) throws IOException, SAXException {
+    public void test_children_only() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config-01-ext.xml"));
         StreamSource source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
         JavaResult result = new JavaResult();
 
-        smooks.setFilterSettings(filterSettings);
         smooks.filterSource(source, result);
 
         XMLUnit.setIgnoreWhitespace( true );
@@ -84,21 +72,11 @@ public class FragmentSerializerNSConfigTest {
     }
 
     @Test
-    public void test_all_SAX() throws IOException, SAXException {
-    	test_all(FilterSettings.DEFAULT_SAX);
-    }
-  
-    @Test
-    public void test_all_DOM() throws IOException, SAXException {
-    	test_all(FilterSettings.DEFAULT_DOM);
-    }
-
-    private void test_all(FilterSettings filterSettings) throws IOException, SAXException {
+    public void test_all() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config-02-ext.xml"));
         StreamSource source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
         JavaResult result = new JavaResult();
 
-        smooks.setFilterSettings(filterSettings);
         smooks.filterSource(source, result);
 
         XMLUnit.setIgnoreWhitespace( true );

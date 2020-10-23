@@ -45,22 +45,21 @@ package org.smooks.cartridges.routing.basic;
 import org.smooks.SmooksException;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Fragment;
-import org.smooks.delivery.VisitLifecycleCleanable;
-import org.smooks.delivery.dom.DOMVisitAfter;
-import org.smooks.delivery.dom.DOMVisitBefore;
+import org.smooks.delivery.dom.serialize.DefaultDOMSerializerVisitor;
 import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.*;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
+import org.smooks.delivery.sax.ng.DynamicSaxNgElementVisitorList;
+import org.smooks.delivery.sax.ng.ElementVisitor;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.lifecycle.BeanContextLifecycleEvent;
 import org.smooks.javabean.lifecycle.BeanLifecycle;
 import org.smooks.javabean.repository.BeanId;
+import org.smooks.lifecycle.VisitLifecycleCleanable;
 import org.smooks.namespace.NamespaceDeclarationStack;
 import org.smooks.util.CollectionsUtil;
 import org.smooks.xml.NamespaceManager;
-import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Element;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
 
 import javax.inject.Inject;
 import javax.xml.XMLConstants;
@@ -76,7 +75,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
-public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVisitBefore, DOMVisitAfter, Producer, VisitLifecycleCleanable {
+public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer, VisitLifecycleCleanable {
 
     private String bindTo;
     private boolean omitXMLDeclaration;
@@ -138,16 +137,16 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
 		return CollectionsUtil.toSet(bindTo);
 	}
 
-	@SuppressWarnings("unchecked")
-	public void visitBefore(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException, IOException {
-    	Map<String, SAXSerializer> fragmentSerializers = (Map<String, SAXSerializer>) executionContext.getAttribute(FragmentSerializer.class);
+	@Override
+	public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
+    	Map<String, FragmentSerializerVisitor> fragmentSerializers = executionContext.getAttribute(FragmentSerializer.class);
     	
     	if(fragmentSerializers == null) {
-    		fragmentSerializers = new HashMap<String, SAXSerializer>();
+    		fragmentSerializers = new HashMap<>();
         	executionContext.setAttribute(FragmentSerializer.class, fragmentSerializers);
     	}
-    	
-    	SAXSerializer serializer = new SAXSerializer();
+
+		FragmentSerializerVisitor serializer = new FragmentSerializerVisitor();
     	fragmentSerializers.put(bindTo, serializer);
     	
         if(!omitXMLDeclaration) {
@@ -155,42 +154,22 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
         }
     	
     	// Now add a dynamic visitor...
-        DynamicSAXElementVisitorList.addDynamicVisitor(serializer, executionContext);
+		DynamicSaxNgElementVisitorList.addDynamicVisitor(serializer, executionContext);
 
-        notifyStartBean(new Fragment(saxElement), executionContext);
-    }
-
-    @SuppressWarnings("unchecked")
-	public void visitAfter(SAXElement saxElement, ExecutionContext executionContext) throws SmooksException, IOException {
-    	Map<String, SAXSerializer> fragmentSerializers = (Map<String, SAXSerializer>) executionContext.getAttribute(FragmentSerializer.class);
-    	SAXSerializer serializer = fragmentSerializers.get(bindTo);
-
-    	try {
-    		executionContext.getBeanContext().addBean(bindTo, serializer.fragmentWriter.toString().trim(), new Fragment(saxElement));
-    	} finally {
-            DynamicSAXElementVisitorList.removeDynamicVisitor(serializer, executionContext);
-    	}
-    }
-
-    public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         notifyStartBean(new Fragment(element), executionContext);
     }
 
-    public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-		String serializedFragment;
+	@Override
+	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
+    	Map<String, FragmentSerializerVisitor> fragmentSerializers = executionContext.getAttribute(FragmentSerializer.class);
+		FragmentSerializerVisitor serializer = fragmentSerializers.get(bindTo);
 
-        if(childContentOnly) {
-        	serializedFragment = XmlUtil.serialize(element.getChildNodes(), false);
-        } else {
-        	serializedFragment = XmlUtil.serialize(element, true);
-        }
-
-        if(!omitXMLDeclaration) {
-        	serializedFragment = "<?xml version=\"1.0\"?>\n" + serializedFragment;
-        }
-
-        executionContext.getBeanContext().addBean(bindTo, serializedFragment, new Fragment(element));
-	}
+    	try {
+    		executionContext.getBeanContext().addBean(bindTo, serializer.fragmentWriter.toString().trim(), new Fragment(element));
+    	} finally {
+			DynamicSaxNgElementVisitorList.removeDynamicVisitor(serializer, executionContext);
+    	}
+    }
 
     private void notifyStartBean(Fragment source, ExecutionContext executionContext) {
         BeanContext beanContext = executionContext.getBeanContext();
@@ -210,52 +189,83 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
         }
     }
 
-    private class SAXSerializer implements SAXElementVisitor {
-		
-    	int depth = 0;
-    	StringWriter fragmentWriter = new StringWriter();
+	private class FragmentSerializerVisitor implements ElementVisitor {
 
-		public void visitBefore(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-            if (depth == 0) {
-                addRootNamespaces(element, executionContext);
+    	private int depth = 0;
+		private StringWriter fragmentWriter = new StringWriter();
+		private DefaultDOMSerializerVisitor serializerVisitor;
+    	
+		public FragmentSerializerVisitor() {
+			serializerVisitor = new DefaultDOMSerializerVisitor();
+			serializerVisitor.postConstruct();
+		}
+		
+    	@Override
+		public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
+			Element copyElement = (Element) element.cloneNode(false);
+			if (depth == 0) {
+                addRootNamespaces(copyElement, executionContext);
             }
 
 	        if(childContentOnly) {
 	        	// Print child content only, so only print the start if the depth is greater
 	        	// than 1...
 	        	if(depth > 0) {
-	        		SAXElementWriterUtil.writeStartElement(element, fragmentWriter, true);
+					try {
+						serializerVisitor.writeStartElement(copyElement, fragmentWriter, null);
+					} catch (IOException e) {
+						throw new SmooksException(e.getMessage(), e);
+					}
 	        	}
 	        } else {
-	        	// Printing all of the element, so just print the start element...
-	        	SAXElementWriterUtil.writeStartElement(element, fragmentWriter, true);
+				try {
+					// Printing all of the element, so just print the start element...
+					serializerVisitor.writeStartElement(copyElement, fragmentWriter, null);
+				} catch (IOException e) {
+					throw new SmooksException(e.getMessage(), e);
+				}
 	        }
 	        depth++;
 		}
 
-		public void onChildElement(SAXElement element, SAXElement childElement, ExecutionContext executionContext) throws SmooksException, IOException {
-	    	// The child element will look after itself.
-	    }
-	    
-		public void onChildText(SAXElement element, SAXText text, ExecutionContext executionContext) throws SmooksException, IOException {
-	    	SAXElementWriterUtil.writeText(text, fragmentWriter);
-	    }
+		@Override
+		public void visitChildElement(Element element, ExecutionContext executionContext) throws SmooksException {
+			// The child element will look after itself.
+		}
 
-		public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
+		@Override
+		public void visitChildText(Element element, ExecutionContext executionContext) throws SmooksException {
+			try {
+				serializerVisitor.writeCharacterData(element.getFirstChild(), fragmentWriter, executionContext);
+			} catch (IOException e) {
+				throw new SmooksException(e.getMessage(), e);
+			}
+		}
+
+		@Override
+		public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
 	        depth--;
 	        if(childContentOnly) {
 	        	// Print child content only, so only print the empty element if the depth is greater
 	        	// than 1...
 	        	if(depth > 0) {
-	        		SAXElementWriterUtil.writeEndElement(element, fragmentWriter);
-	        	}
+					try {
+						serializerVisitor.writeEndElement(element, fragmentWriter, null);
+					} catch (IOException e) {
+						throw new SmooksException(e.getMessage(), e);
+					}
+				}
 	        } else {
 	        	// Printing all of the elements, so just print the end of the element...
-	        	SAXElementWriterUtil.writeEndElement(element, fragmentWriter);
+				try {
+					serializerVisitor.writeEndElement(element, fragmentWriter, null);
+				} catch (IOException e) {
+					throw new SmooksException(e.getMessage(), e);
+				}
 	        }
 		}		
 
-        private void addRootNamespaces(SAXElement element, ExecutionContext executionContext) {
+        private void addRootNamespaces(Element element, ExecutionContext executionContext) {
             NamespaceDeclarationStack nsDeclStack = NamespaceManager.getNamespaceDeclarationStack(executionContext);
             Map<String, String> rootNamespaces = nsDeclStack.getActiveNamespaces();
 
@@ -267,7 +277,7 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
             }
         }
 
-		private void addNamespace(String prefix, String namespaceURI, SAXElement element) {
+		private void addNamespace(String prefix, String namespaceURI, Element element) {
             if (prefix == null || namespaceURI == null) {
                 // No namespace.  Ignore...
                 return;
@@ -281,17 +291,12 @@ public class FragmentSerializer implements SAXVisitBefore, SAXVisitAfter, DOMVis
 					return;
 				}
 			}
-			
-			Attributes attributes = element.getAttributes();
-	        AttributesImpl attributesCopy = new AttributesImpl();
-	        attributesCopy.setAttributes(attributes);
-	        
-	        if(prefix.length() > 0) {
-	        	attributesCopy.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix, "xmlns:" + prefix, null, namespaceURI);
-	        } else {
-	        	attributesCopy.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix, "xmlns", null, namespaceURI);
-	        }
-	        element.setAttributes(attributesCopy);
+
+			if(prefix.length() > 0) {
+				element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix, namespaceURI);
+			} else {
+				element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns", namespaceURI);
+			}
 		}
 	}
 }
