@@ -51,16 +51,16 @@ import org.smooks.cartridges.routing.SmooksRoutingException;
 import org.smooks.cartridges.routing.util.RouterTestHelper;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.injector.Scope;
-import org.smooks.cdr.lifecycle.LifecycleManager;
-import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.cdr.registry.Registry;
-import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.container.MockExecutionContext;
-import org.smooks.delivery.sax.SAXElement;
+import org.smooks.injector.Scope;
+import org.smooks.lifecycle.LifecycleManager;
+import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.registry.Registry;
+import org.smooks.registry.lookup.LifecycleManagerLookup;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
@@ -114,7 +114,7 @@ public class JMSRouterTest {
         final JMSRouter router = new JMSRouter();
         lifecycleManager.applyPhase(router, new PostConstructLifecyclePhase(new Scope(registry, config, router)));
 
-        router.visitAfter((SAXElement) null, executionContext);
+        router.visitAfter(null, executionContext);
 
         final Message message = queue.getMessage();
         assertTrue("Message in queue should have been of type TextMessage",
@@ -151,7 +151,7 @@ public class JMSRouterTest {
 
         // Fire the messages...
         for (int i = 0; i < numMessages; i++) {
-            router.visitAfter((SAXElement) null, executionContext);
+            router.visitAfter((Element) null, executionContext);
         }
 
         // wait for the thread to finish...
@@ -178,12 +178,13 @@ public class JMSRouterTest {
         final JMSRouter router = new JMSRouter();
         lifecycleManager.applyPhase(router, new PostConstructLifecyclePhase(new Scope(registry, config, router)));
 
-        router.visitAfter((SAXElement) null, executionContext);
-        router.visitAfter((SAXElement) null, executionContext);
-        router.visitAfter((SAXElement) null, executionContext);
+        router.visitAfter(null, executionContext);
+        router.visitAfter(null, executionContext);
+        router.visitAfter(null,
+                executionContext);
 
         try {
-            router.visitAfter((SAXElement) null, executionContext);
+            router.visitAfter(null, executionContext);
             fail("Expected SmooksRoutingException");
         } catch (SmooksRoutingException e) {
             assertEquals("Failed to route JMS message to Queue destination 'testQueue'. Timed out (3000 ms) waiting for queue length to drop below High Water Mark (3).  Consider increasing 'highWaterMark' and/or 'highWaterMarkTimeout' param values.", e.getMessage());
@@ -248,7 +249,7 @@ public class JMSRouterTest {
         config.setParameter("beanId", "bla");
     }
 
-    class ConsumeThread extends Thread {
+    static class ConsumeThread extends Thread {
 
         private volatile boolean running = false;
         private int numMessagesProcessed;

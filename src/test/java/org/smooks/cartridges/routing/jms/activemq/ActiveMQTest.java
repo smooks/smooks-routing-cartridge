@@ -42,7 +42,6 @@
  */
 package org.smooks.cartridges.routing.jms.activemq;
 
-import org.smooks.FilterSettings;
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.routing.jms.JMSRouter;
@@ -84,31 +83,18 @@ public class ActiveMQTest {
     public static void stopActiveMQ() throws Exception {
         mqProvider.stop();
     }
-
+    
     @Test
-    public void test_xml_config_dom() throws IOException, SAXException, JMSException, InterruptedException {
+    public void test_xml_config() throws IOException, SAXException, JMSException, InterruptedException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("config-01.xml"));
-        test(smooks, FilterSettings.DEFAULT_DOM);
+        test(smooks);
     }
-
+    
     @Test
-    public void test_xml_config_sax() throws IOException, SAXException, JMSException, InterruptedException {
-        Smooks smooks = new Smooks(getClass().getResourceAsStream("config-01.xml"));
-        test(smooks, FilterSettings.DEFAULT_SAX);
-    }
-
-    @Test
-    public void test_xml_programmatic_dom() throws JMSException, InterruptedException {
+    public void test_xml_programmatic() throws JMSException, InterruptedException {
         Smooks smooks = new Smooks();
         configure(smooks);
-        test(smooks, FilterSettings.DEFAULT_DOM);
-    }
-
-    @Test
-    public void test_xml_programmatic_sax() throws JMSException, InterruptedException {
-        Smooks smooks = new Smooks();
-        configure(smooks);
-        test(smooks, FilterSettings.DEFAULT_SAX);
+        test(smooks);
     }
 
     private void configure(Smooks smooks) {
@@ -127,9 +113,8 @@ public class ActiveMQTest {
         smooks.addVisitor(jmsRouter, "a");
     }
 
-    private void test(Smooks smooks, FilterSettings filterSettings) throws JMSException, InterruptedException {
+    private void test(Smooks smooks) throws JMSException, InterruptedException {
         try {
-            smooks.setFilterSettings(filterSettings);
             listener.getMessages().clear();
             smooks.filterSource(new StringSource("<root><a>1</a><a>2</a><a>3</a></root>"));
 

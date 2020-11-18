@@ -42,18 +42,13 @@
  */
 package org.smooks.cartridges.routing.basic;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.smooks.FilterSettings;
+import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.SmooksException;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.dom.DOMVisitAfter;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
+import org.smooks.delivery.sax.ng.AfterVisitor;
 import org.smooks.payload.JavaResult;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -66,27 +61,19 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
 public class FragmentSerializerTest {
-
+    
     @Test
-    public void test_children_only_SAX() throws IOException, SAXException {
-    	test_children_only(FilterSettings.DEFAULT_SAX);
-    }
-
-    @Test
-    public void test_children_only_DOM() throws IOException, SAXException {
-    	test_children_only(FilterSettings.DEFAULT_DOM);
-    }
-
-    private void test_children_only(FilterSettings filterSettings) throws IOException, SAXException {
+    public void test_children_only() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config-01.xml"));
         StreamSource source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
         JavaResult result = new JavaResult();
 
-        smooks.setFilterSettings(filterSettings);
         smooks.filterSource(source, result);
 
         XMLUnit.setIgnoreWhitespace( true );
@@ -94,67 +81,42 @@ public class FragmentSerializerTest {
         Object bean = result.getBean("soapBody");
         XMLAssert.assertXMLEqual(new InputStreamReader(stream), new StringReader(bean.toString().trim()));
     }
-
+    
     @Test
-    public void test_all_SAX() throws IOException, SAXException {
-    	test_all(FilterSettings.DEFAULT_SAX);
-    }
-
-    @Test
-    public void test_all_DOM() throws IOException, SAXException {
-    	test_all(FilterSettings.DEFAULT_DOM);
-    }
-
-    private void test_all(FilterSettings filterSettings) throws IOException, SAXException {
+    public void test_all() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config-02.xml"));
         StreamSource source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
         JavaResult result = new JavaResult();
 
-        smooks.setFilterSettings(filterSettings);
         smooks.filterSource(source, result);
 
         XMLUnit.setIgnoreWhitespace( true );
         XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream("all.xml")), new StringReader(result.getBean("soapBody").toString().trim()));
     }
-
-    @Test    
-    public void test_multi_fragments_SAX() throws IOException, SAXException {
-    	test_multi_fragments(FilterSettings.DEFAULT_SAX);
-    }
-
+    
     @Test
-    public void test_multi_fragments_DOM() throws IOException, SAXException {
-    	test_multi_fragments(FilterSettings.DEFAULT_DOM);
-    }
-
-    private void test_multi_fragments(FilterSettings filterSettings) throws IOException, SAXException {
+    public void test_multi_fragments() throws IOException, SAXException {
         Smooks smooks = new Smooks();
 
         smooks.addVisitor(new FragmentSerializer().setBindTo("orderItem"), "order-items/order-item");
         MockRouter router = new MockRouter().setBoundTo("orderItem");
         smooks.addVisitor(router, "order-items/order-item");
 
-        smooks.setFilterSettings(filterSettings);
         smooks.filterSource(new StreamSource(getClass().getResourceAsStream("input-message-02.xml")));
         assertEquals(2, router.routedObjects.size());
-
-//        System.out.println(router.routedObjects.get(0));
-
+        
         XMLUnit.setIgnoreWhitespace( true );
         XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream("frag1.xml")), new StringReader((String) router.routedObjects.get(0)));
         XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream("frag2.xml")), new StringReader((String) router.routedObjects.get(1)));
     }
     
-    private class MockRouter implements SAXVisitAfter, DOMVisitAfter {
+    private static class MockRouter implements AfterVisitor {
 
         private String boundTo;
-        private List<Object> routedObjects = new ArrayList<Object>();
+        private final List<Object> routedObjects = new ArrayList<>();
     	
-		public void visitAfter(SAXElement element, ExecutionContext executionContext) throws SmooksException, IOException {
-			routedObjects.add(executionContext.getBeanContext().getBean(boundTo));
-		}
-
-		public void visitAfter(Element element,	ExecutionContext executionContext) throws SmooksException {
+        @Override
+		public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
 			routedObjects.add(executionContext.getBeanContext().getBean(boundTo));
 		}
 		

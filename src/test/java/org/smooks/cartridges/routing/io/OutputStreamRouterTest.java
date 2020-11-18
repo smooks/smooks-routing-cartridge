@@ -43,12 +43,12 @@
 package org.smooks.cartridges.routing.io;
 
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.injector.Scope;
-import org.smooks.cdr.lifecycle.LifecycleManager;
-import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.cdr.registry.Registry;
-import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.MockApplicationContext;
+import org.smooks.injector.Scope;
+import org.smooks.lifecycle.LifecycleManager;
+import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.registry.Registry;
+import org.smooks.registry.lookup.LifecycleManagerLookup;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 

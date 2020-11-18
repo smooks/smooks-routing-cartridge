@@ -63,7 +63,7 @@
     </resource-config>
 
     <resource-config selector="#document">
-        <resource>org.smooks.cartridges.routing.db.ResultsetRowSelector</resource>
+        <resource>org.smooks.cartridges.routing.db.ResultSetRowSelector</resource>
         <param name="executeBefore">true</param>
         <param name="resultSetName">orders1</param>
         <param name="beanId">myOrder</param>

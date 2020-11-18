@@ -43,8 +43,10 @@
 package org.smooks.cartridges.routing.db.JIRAs.MILYN_345;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.smooks.cartridges.routing.db.ResultsetRowSelector;
+import org.smooks.cartridges.routing.db.ResultSetRowSelector;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
@@ -53,7 +55,7 @@ public class MILYN_345_Test {
 
     @Test
     public void test_where() {
-        ResultsetRowSelector selector = new ResultsetRowSelector();
+        ResultSetRowSelector selector = new ResultSetRowSelector();
 
         selector.setWhereClause("a == b");
         assertFalse(selector.consumes("x"));
@@ -62,7 +64,7 @@ public class MILYN_345_Test {
 
     @Test
     public void test_failError() {
-        ResultsetRowSelector selector = new ResultsetRowSelector();
+        ResultSetRowSelector selector = new ResultSetRowSelector();
 
         selector.setFailedSelectError("this is an error on ${productId}");
         assertFalse(selector.consumes("zzzzzzzzzz"));
