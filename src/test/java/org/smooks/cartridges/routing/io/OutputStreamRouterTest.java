@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.routing.io;
 
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.injector.Scope;
 import org.smooks.lifecycle.LifecycleManager;
@@ -66,7 +66,7 @@ public class OutputStreamRouterTest
 	private String resourceName = "testResource";
 	private String beanId = "testBeanId";
 	private OutputStreamRouter router = new OutputStreamRouter();
-	private SmooksResourceConfiguration config;
+	private ResourceConfig config;
 
 	@Test
 	public void configure() {
@@ -86,11 +86,11 @@ public class OutputStreamRouterTest
 	
 	//	private
 	
-	private SmooksResourceConfiguration createConfig( 
+	private ResourceConfig createConfig( 
 			final String resourceName,
 			final String beanId)
 	{
-    	SmooksResourceConfiguration config = new SmooksResourceConfiguration( "x", OutputStreamRouter.class.getName() );
+		ResourceConfig config = new ResourceConfig( "x", OutputStreamRouter.class.getName() );
 		config.setParameter( "resourceName", resourceName );
 		config.setParameter( "beanId", beanId );
 		return config;

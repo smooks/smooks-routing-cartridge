@@ -47,7 +47,7 @@ import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.templating.OutputTo;
 import org.smooks.cartridges.templating.TemplatingConfiguration;
 import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.container.MockExecutionContext;
@@ -95,7 +95,7 @@ public class FileOutputStreamResourceTest {
         Registry registry = new MockApplicationContext().getRegistry();
         LifecycleManager lifecycleManager = registry.lookup(new LifecycleManagerLookup());
         String listFileName = "testListFileName";
-        SmooksResourceConfiguration config = createConfig(resourceName, fileNamePattern, destinationDirectory, listFileName);
+        ResourceConfig config = createConfig(resourceName, fileNamePattern, destinationDirectory, listFileName);
         lifecycleManager.applyPhase(resource, new PostConstructLifecyclePhase(new Scope(registry, config, resource)));
         deleteFiles();
     }
@@ -215,12 +215,12 @@ public class FileOutputStreamResourceTest {
         file3.delete();
     }
 
-    private SmooksResourceConfiguration createConfig(
+    private ResourceConfig createConfig(
             final String resourceName,
             final String fileName,
             final String destinationDirectory,
             final String listFileName) {
-        SmooksResourceConfiguration config = new SmooksResourceConfiguration("x", FileOutputStreamResource.class.getName());
+        ResourceConfig config = new ResourceConfig("x", FileOutputStreamResource.class.getName());
         config.setParameter("resourceName", resourceName);
         config.setParameter("fileNamePattern", fileName);
         config.setParameter("destinationDirectoryPattern", destinationDirectory);
