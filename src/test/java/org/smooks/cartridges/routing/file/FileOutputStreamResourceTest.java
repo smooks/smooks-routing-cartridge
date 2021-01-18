@@ -44,34 +44,37 @@ package org.smooks.cartridges.routing.file;
 
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
-import org.smooks.cartridges.templating.OutputTo;
 import org.smooks.cartridges.templating.TemplatingConfiguration;
 import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
 import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.container.MockExecutionContext;
-import org.smooks.delivery.Fragment;
+import org.smooks.container.standalone.DefaultApplicationContextBuilder;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.injector.Scope;
-import org.smooks.io.AbstractOutputStreamResource;
 import org.smooks.io.FileUtils;
+import org.smooks.io.ResourceOutputStream;
 import org.smooks.lifecycle.LifecycleManager;
 import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
 import org.smooks.payload.StringSource;
 import org.smooks.registry.Registry;
 import org.smooks.registry.lookup.LifecycleManagerLookup;
+import org.smooks.visitors.smooks.NestedSmooksVisitor;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static org.testng.AssertJUnit.*;
 
@@ -110,10 +113,10 @@ public class FileOutputStreamResourceTest {
         MockExecutionContext executionContext = new MockExecutionContext();
         resource.visitBefore((Element) null, executionContext);
 
-        OutputStream outputStream = AbstractOutputStreamResource.getOutputStream(resource.getResourceName(), executionContext);
+        OutputStream outputStream = new ResourceOutputStream(executionContext, resource.getResourceName()).getDelegateOutputStream();
         assertTrue(outputStream instanceof FileOutputStream);
 
-        resource.executeVisitLifecycleCleanup(new Fragment((Element) null), executionContext);
+        resource.executeVisitLifecycleCleanup(new NodeFragment(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()), executionContext);
 
         assertThatFilesWereGenerated(executionContext);
     }
@@ -159,8 +162,16 @@ public class FileOutputStreamResourceTest {
         Smooks smooks = new Smooks();
 
         try {
+            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().setRegisterSystemResources(false).build());
+            nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
+
+            NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
+            nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.OUTPUT_TO));
+            nestedSmooksVisitor.setOutputStreamResourceOptional(Optional.of("fileOS"));
+            nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
+            
             smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
-            smooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}").setUsage(OutputTo.stream("fileOS"))), "a");
+            smooks.addVisitor(nestedSmooksVisitor, "a");
             smooks.addVisitor(new FileOutputStreamResource().setFileNamePattern("${object.a}.xml").setDestinationDirectoryPattern("target/config-01-test/${object.a}").setResourceName("fileOS"), "a");
 
             smooks.filterSource(new StringSource("<root><a>1</a><a>2</a><a>3</a></root>"));
@@ -180,11 +191,18 @@ public class FileOutputStreamResourceTest {
         final String outputStreamRef = "fileOS";
         final File destinationDir = new File("target/config-01-test");
         final File outputFile = new File(destinationDir, outputFileName);
-
+        
         try {
+            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().setRegisterSystemResources(false).build());
+            nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
+
+            NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
+            nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.OUTPUT_TO));
+            nestedSmooksVisitor.setOutputStreamResourceOptional(Optional.of(outputStreamRef));
+            nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
+            
             smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
-            smooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")
-                    .setUsage(OutputTo.stream(outputStreamRef))), "a");
+            smooks.addVisitor(nestedSmooksVisitor, "a");
             smooks.addVisitor(new FileOutputStreamResource()
                             .setAppend(true)
                             .setFileNamePattern(outputFileName)

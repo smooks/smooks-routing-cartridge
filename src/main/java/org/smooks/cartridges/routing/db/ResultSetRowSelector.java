@@ -49,9 +49,9 @@ import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
 import org.smooks.delivery.sax.ng.AfterVisitor;
@@ -176,15 +176,15 @@ public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Produc
 
     @Override
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-        selectRow(executionContext, new Fragment(element));
+        selectRow(executionContext, new NodeFragment(element));
     }
 
     @Override
     public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-        selectRow(executionContext, new Fragment(element));
+        selectRow(executionContext, new NodeFragment(element));
     }
     
-    private void selectRow(ExecutionContext executionContext, Fragment source) throws SmooksException {
+    private void selectRow(ExecutionContext executionContext, NodeFragment source) throws SmooksException {
     	BeanContext beanRepository = executionContext.getBeanContext();
 
     	Map<String, Object> beanMapClone = new HashMap<>(beanRepository.getBeanMap());

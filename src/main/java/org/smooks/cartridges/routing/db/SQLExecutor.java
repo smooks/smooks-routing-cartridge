@@ -48,9 +48,9 @@ import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.db.AbstractDataSource;
-import org.smooks.delivery.Fragment;
 import org.smooks.delivery.annotation.VisitAfterIf;
 import org.smooks.delivery.annotation.VisitBeforeIf;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.ordering.Producer;
 import org.smooks.delivery.sax.ng.AfterVisitor;
@@ -176,15 +176,15 @@ public class SQLExecutor implements BeforeVisitor, AfterVisitor, Producer, Consu
 
     @Override
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-        executeSQL(executionContext, new Fragment(element));
+        executeSQL(executionContext, new NodeFragment(element));
     }
 
     @Override
     public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-        executeSQL(executionContext, new Fragment(element));
+        executeSQL(executionContext, new NodeFragment(element));
     }
 
-    private void executeSQL(ExecutionContext executionContext, Fragment source) throws SmooksException {
+    private void executeSQL(ExecutionContext executionContext, NodeFragment source) throws SmooksException {
         Connection connection = AbstractDataSource.getConnection(datasource, executionContext);
         BeanContext beanContext = executionContext.getBeanContext();
 
@@ -253,11 +253,11 @@ public class SQLExecutor implements BeforeVisitor, AfterVisitor, Producer, Consu
         }
 
         private static ResultSetContextObject getInstance(String rsAppContextKey, ApplicationContext appContext) {
-            ResultSetContextObject rsContextObj = (ResultSetContextObject) appContext.getRegistry().lookup(rsAppContextKey);
+            ResultSetContextObject rsContextObj = appContext.getRegistry().lookup(rsAppContextKey);
 
             if (rsContextObj == null) {
                 synchronized (appContext) {
-                    rsContextObj = (ResultSetContextObject) appContext.getRegistry().lookup(rsAppContextKey);
+                    rsContextObj = appContext.getRegistry().lookup(rsAppContextKey);
                     if (rsContextObj == null) {
                         rsContextObj = new ResultSetContextObject();
                         appContext.getRegistry().registerObject(rsAppContextKey, rsContextObj);
