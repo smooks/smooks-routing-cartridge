@@ -45,6 +45,7 @@
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
                       xmlns:ftl="https://www.smooks.org/xsd/smooks/freemarker-2.0.xsd"
                       xmlns:file="https://www.smooks.org/xsd/smooks/file-routing-2.0.xsd"
+                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd">
 
     <!--
@@ -61,16 +62,22 @@
     </resource-config>
 
     <!-- Apply a template to each "Flight" NodeModel (captured above), outputting to the file stream (below) -->
-    <ftl:freemarker applyOnElement="Flight">
-        <ftl:template><!--<?xml version="1.0" encoding="utf-8"?>
+    <core:smooks filterSourceOn="Flight">
+        <core:action>
+            <core:outputTo outputStreamResource="flightSplitStream"/>
+        </core:action>
+        <core:config>
+            <smooks-resource-list>
+                <ftl:freemarker applyOnElement="Flight">
+                    <ftl:template><!--<?xml version="1.0" encoding="utf-8"?>
 <COMP_FIDS xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.comp.aero/fids">
     <@serialize nodeModel=Flight format=true />    
 </COMP_FIDS>--></ftl:template>
-        <ftl:use>
-            <ftl:outputTo outputStreamResource="flightSplitStream" />
-        </ftl:use>
-    </ftl:freemarker>
-
+                </ftl:freemarker>
+            </smooks-resource-list>
+        </core:config>
+    </core:smooks>
+    
     <!-- Capture all the flight identification info into a Map - used to name the split files (below) -->
     <jb:bean beanId="flightIdent" class="java.util.HashMap" createOnElement="Identification">
         <jb:value data="Identification/*" />

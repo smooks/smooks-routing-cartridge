@@ -45,18 +45,25 @@
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd"
                       xmlns:file="https://www.smooks.org/xsd/smooks/file-routing-2.0.xsd"
+                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:ftl="https://www.smooks.org/xsd/smooks/freemarker-2.0.xsd">
     
     <jb:bean beanId="object" class="java.util.HashMap" createOnElement="#document">
         <jb:value property="a" data="a" />
     </jb:bean>
 
-    <ftl:freemarker applyOnElement="a">
-        <ftl:template>${object.a}</ftl:template>
-        <ftl:use>
-            <ftl:outputTo outputStreamResource="fileOS"/>
-        </ftl:use>
-    </ftl:freemarker>
+    <core:smooks filterSourceOn="a">
+        <core:action>
+            <core:outputTo outputStreamResource="fileOS"/>
+        </core:action>
+        <core:config>
+            <smooks-resource-list>
+                <ftl:freemarker applyOnElement="a">
+                    <ftl:template>${object.a}</ftl:template>
+                </ftl:freemarker>
+            </smooks-resource-list>
+        </core:config>
+    </core:smooks>
 
     <file:outputStream openOnElement="a" resourceName="fileOS">
         <file:fileNamePattern>${object.a}.xml</file:fileNamePattern>

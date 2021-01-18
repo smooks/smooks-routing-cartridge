@@ -49,6 +49,7 @@ import org.smooks.assertion.AssertArgument;
 import org.smooks.cartridges.routing.SmooksRoutingException;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ExecutionContext;
+import org.smooks.container.TypedKey;
 import org.smooks.expression.ExpressionEvaluator;
 import org.smooks.expression.MVELExpressionEvaluator;
 import org.smooks.io.AbstractOutputStreamResource;
@@ -236,7 +237,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
         } else {
             final File tmpFile = File.createTempFile("." + UUID.randomUUID().toString(), ".working", destinationDirectory);
             final FileOutputStream fileOutputStream = new FileOutputStream(tmpFile, false);
-            executionContext.setAttribute(TMP_FILE_CONTEXT_KEY_PREFIX + getResourceName(), tmpFile);
+            executionContext.put(new TypedKey<>(TMP_FILE_CONTEXT_KEY_PREFIX + getResourceName()), tmpFile);
             return fileOutputStream;
         }
     }
@@ -316,7 +317,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
     //	private
 
     private File renameWorkingFile(ExecutionContext executionContext) {
-        File workingFile = (File) executionContext.getAttribute(TMP_FILE_CONTEXT_KEY_PREFIX + getResourceName());
+        File workingFile = executionContext.get(new TypedKey<File>(TMP_FILE_CONTEXT_KEY_PREFIX + getResourceName()));
 
         if (workingFile == null || !workingFile.exists()) {
             return null;
@@ -348,7 +349,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
 
     private void addToListFile(ExecutionContext executionContext, File newFile) {
         if (listFileNamePatternCtxKey != null) {
-            FileWriter writer = (FileWriter) executionContext.getAttribute(listFileNamePatternCtxKey);
+            FileWriter writer = executionContext.get(new TypedKey<>(listFileNamePatternCtxKey));
 
             if (writer == null) {
                 String listFileName = getListFileName(executionContext);
@@ -357,7 +358,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
                 FileListAccessor.addFileName(listFile.getAbsolutePath(), executionContext);
                 try {
                     writer = new FileWriter(listFile);
-                    executionContext.setAttribute(listFileNamePatternCtxKey, writer);
+                    executionContext.put(new TypedKey<>(listFileNamePatternCtxKey), writer);
                 } catch (IOException e) {
                     throw new SmooksException("", e);
                 }
@@ -378,7 +379,7 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
 
         // Close the list file, if there's one open...
         if (listFileNamePatternCtxKey != null) {
-            FileWriter writer = (FileWriter) executionContext.getAttribute(listFileNamePatternCtxKey);
+            FileWriter writer = executionContext.get(new TypedKey<>(listFileNamePatternCtxKey));
 
             if (writer != null) {
                 try {

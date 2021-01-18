@@ -53,6 +53,7 @@ import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.sax.ng.AfterVisitor;
 import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.io.AbstractOutputStreamResource;
+import org.smooks.io.ResourceOutputStream;
 import org.smooks.javabean.context.BeanContext;
 import org.smooks.javabean.repository.BeanId;
 import org.w3c.dom.Element;
@@ -158,8 +159,8 @@ public class OutputStreamRouter implements BeforeVisitor, AfterVisitor, Consumer
         {
         	throw new SmooksException( "A bean with id [" + beanId + "] was not found in the executionContext");
         }
-
-        OutputStream out = AbstractOutputStreamResource.getOutputStream( resourceName, executionContext );
+        
+        OutputStream out = new ResourceOutputStream(executionContext, resourceName);
 		try
 		{
 			if ( bean instanceof String )

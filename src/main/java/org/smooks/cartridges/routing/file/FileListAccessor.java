@@ -51,6 +51,7 @@ import java.util.Map;
 
 import org.smooks.assertion.AssertArgument;
 import org.smooks.container.ExecutionContext;
+import org.smooks.container.TypedKey;
 
 /**
  * FileListAccessor is a utility class that retrieves list file names
@@ -65,7 +66,7 @@ public class FileListAccessor
     /*
 	 * 	Keys for the entry containing the file lists (used in ExecutionContexts attribute map )
      */
-    private static final String ALL_LIST_FILE_NAME_CONTEXT_KEY = FileListAccessor.class.getName() + "#allListFileName";
+    private static final TypedKey<List<String>> ALL_LIST_FILE_NAME_CONTEXT_KEY = new TypedKey<>();
     
 	private FileListAccessor() { }
 	
@@ -78,24 +79,21 @@ public class FileListAccessor
 	 * @param fileName 	- list file name to add to the context
 	 * @param execContext	- Smooks ExceutionContext
 	 */
-	public static void addFileName( final String fileName, final ExecutionContext execContext )
-	{
-		AssertArgument.isNotNullAndNotEmpty( fileName, "fileName" );
-		
-		@SuppressWarnings ("unchecked")
-		List<String> allListFiles = (List<String>) execContext.getAttribute( ALL_LIST_FILE_NAME_CONTEXT_KEY );
-		if ( allListFiles == null  )
-		{
-			allListFiles = new ArrayList<String>();
+	public static void addFileName(final String fileName, final ExecutionContext execContext) {
+		AssertArgument.isNotNullAndNotEmpty(fileName, "fileName");
+
+		@SuppressWarnings("unchecked")
+		List<String> allListFiles = execContext.get(ALL_LIST_FILE_NAME_CONTEXT_KEY);
+		if (allListFiles == null) {
+			allListFiles = new ArrayList<>();
 		}
-		
+
 		//	no need to have duplicates
-		if ( !allListFiles.contains( fileName ))
-		{
-    		allListFiles.add( fileName );
+		if (!allListFiles.contains(fileName)) {
+			allListFiles.add(fileName);
 		}
-		
-		execContext.setAttribute( ALL_LIST_FILE_NAME_CONTEXT_KEY , allListFiles );
+
+		execContext.put(ALL_LIST_FILE_NAME_CONTEXT_KEY, allListFiles);
 	}
 	
 	/**
@@ -106,39 +104,31 @@ public class FileListAccessor
 	 * @return List<String>		- where String is the absolute path to a file.
 	 * @throws IOException		- If the "fromFile" cannot be found or something else IO related goes wrong.
 	 */
-	public static List<String> getFileList( final ExecutionContext executionContext, String fromFile ) throws IOException
-	{
+	public static List<String> getFileList(final ExecutionContext executionContext, String fromFile) throws IOException {
 		BufferedReader reader = null;
-		try
-		{
-    		reader = new BufferedReader( new FileReader( fromFile ) );
-    		List<String> files = new ArrayList<String>();
-    		String line = null;
-    		while ( (line = reader.readLine() ) != null )
-    		{
-    			files.add( line );
-    		}
-    		return files;
-    	}
-		finally
-		{
-			if ( reader != null )
-			{
+		try {
+			reader = new BufferedReader(new FileReader(fromFile));
+			List<String> files = new ArrayList<String>();
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				files.add(line);
+			}
+			return files;
+		} finally {
+			if (reader != null) {
 				reader.close();
 			}
 		}
 	}
 
-	@SuppressWarnings ( "unchecked" )
-	public static List<String> getListFileNames( final ExecutionContext executionContext )
-	{
-		return (List<String>) executionContext.getAttribute( ALL_LIST_FILE_NAME_CONTEXT_KEY );
+	@SuppressWarnings("unchecked")
+	public static List<String> getListFileNames(final ExecutionContext executionContext) {
+		return executionContext.get(ALL_LIST_FILE_NAME_CONTEXT_KEY);
 	}
-	
-	@SuppressWarnings ( "unchecked" )
-	public static List<String> getListFileNames( final Map attributes )
-	{
-		return (List<String>) attributes.get( ALL_LIST_FILE_NAME_CONTEXT_KEY );
+
+	@SuppressWarnings("unchecked")
+	public static List<String> getListFileNames(final Map attributes) {
+		return (List<String>) attributes.get(ALL_LIST_FILE_NAME_CONTEXT_KEY);
 	}
 
 }

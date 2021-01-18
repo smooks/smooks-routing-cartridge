@@ -46,10 +46,11 @@ import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.routing.jms.JMSRouter;
 import org.smooks.cartridges.routing.jms.TestJMSMessageListener;
-import org.smooks.cartridges.templating.BindTo;
 import org.smooks.cartridges.templating.TemplatingConfiguration;
 import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
+import org.smooks.container.standalone.DefaultApplicationContextBuilder;
 import org.smooks.payload.StringSource;
+import org.smooks.visitors.smooks.NestedSmooksVisitor;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -58,6 +59,7 @@ import org.xml.sax.SAXException;
 import javax.jms.JMSException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -98,12 +100,20 @@ public class ActiveMQTest {
     }
 
     private void configure(Smooks smooks) {
+        Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().setRegisterSystemResources(false).build());
+        nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
+
+        NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
+        nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.BIND_TO));
+        nestedSmooksVisitor.setBindIdOptional(Optional.of("orderItem_xml"));
+        nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
+        
         // Create a HashMap, name it "object" and then bind the <a> data into it, keyed as "a"...
         smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
 
         // On every <a> fragment, apply a simple template and bind the templating result to
         // beanId "orderItem_xml" ...
-        smooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}").setUsage(BindTo.beanId("orderItem_xml"))), "a");
+        smooks.addVisitor(nestedSmooksVisitor, "a");
 
         JMSRouter jmsRouter = new JMSRouter();
         jmsRouter.setDestinationName("objectAQueue");
