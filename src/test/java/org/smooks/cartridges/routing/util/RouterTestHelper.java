@@ -42,9 +42,9 @@
  */
 package org.smooks.cartridges.routing.util;
 
+import org.smooks.api.bean.repository.BeanId;
 import org.smooks.cartridges.routing.jms.TestBean;
-import org.smooks.container.MockExecutionContext;
-import org.smooks.javabean.repository.BeanId;
+import org.smooks.tck.MockExecutionContext;
 
 public final class RouterTestHelper
 {

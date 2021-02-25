@@ -42,28 +42,28 @@
  */
 package org.smooks.cartridges.routing.basic;
 
-import org.smooks.SmooksException;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.TypedKey;
-import org.smooks.delivery.dom.serialize.DefaultDOMSerializerVisitor;
-import org.smooks.delivery.fragment.Fragment;
-import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.delivery.sax.ng.BeforeVisitor;
-import org.smooks.delivery.sax.ng.event.CharDataFragmentEvent;
-import org.smooks.event.ExecutionEvent;
-import org.smooks.event.ExecutionEventListener;
-import org.smooks.event.types.EndFragmentEvent;
-import org.smooks.event.types.StartFragmentEvent;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.lifecycle.BeanContextLifecycleEvent;
-import org.smooks.javabean.lifecycle.BeanLifecycle;
-import org.smooks.javabean.repository.BeanId;
-import org.smooks.lifecycle.VisitLifecycleCleanable;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.TypedKey;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.lifecycle.BeanLifecycle;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.api.delivery.event.ExecutionEvent;
+import org.smooks.api.delivery.event.ExecutionEventListener;
+import org.smooks.api.delivery.fragment.Fragment;
+import org.smooks.api.delivery.ordering.Producer;
+import org.smooks.api.lifecycle.VisitLifecycleCleanable;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
+import org.smooks.engine.bean.lifecycle.DefaultBeanContextLifecycleEvent;
+import org.smooks.engine.delivery.dom.serialize.DefaultDOMSerializerVisitor;
+import org.smooks.engine.delivery.event.EndFragmentEvent;
+import org.smooks.engine.delivery.event.StartFragmentEvent;
+import org.smooks.engine.delivery.fragment.NodeFragment;
+import org.smooks.engine.delivery.sax.ng.CharDataFragmentEvent;
+import org.smooks.engine.xml.NamespaceManager;
 import org.smooks.namespace.NamespaceDeclarationStack;
-import org.smooks.util.CollectionsUtil;
-import org.smooks.xml.NamespaceManager;
+import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 
@@ -130,7 +130,7 @@ public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer
      * Retain the fragment bean in the {@link BeanContext} after it's creating fragment
      * has been processed.
      *
-	 * @param retain True if the fragment bean is to be retained in the {@link org.smooks.javabean.context.BeanContext},
+	 * @param retain True if the fragment bean is to be retained in the {@link org.smooks.api.bean.context.BeanContext},
      * otherwise false.
 	 * @return this instance.
 	 */
@@ -181,7 +181,7 @@ public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer
     private void notifyStartBean(NodeFragment source, ExecutionContext executionContext) {
         BeanContext beanContext = executionContext.getBeanContext();
 
-        beanContext.notifyObservers(new BeanContextLifecycleEvent(executionContext,
+        beanContext.notifyObservers(new DefaultBeanContextLifecycleEvent(executionContext,
                 source, BeanLifecycle.START_FRAGMENT, beanContext.getBeanId(bindTo), ""));
     }
 
@@ -191,7 +191,7 @@ public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer
         BeanId beanId = beanContext.getBeanId(bindTo);
         Object bean = beanContext.getBean(beanId);
 
-        beanContext.notifyObservers(new BeanContextLifecycleEvent(executionContext, fragment, BeanLifecycle.END_FRAGMENT, beanId, bean));
+        beanContext.notifyObservers(new DefaultBeanContextLifecycleEvent(executionContext, fragment, BeanLifecycle.END_FRAGMENT, beanId, bean));
         if(!retain) {
             executionContext.getBeanContext().removeBean(beanId, null);
         }

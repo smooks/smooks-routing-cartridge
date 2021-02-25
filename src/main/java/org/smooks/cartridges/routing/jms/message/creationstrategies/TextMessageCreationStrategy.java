@@ -42,14 +42,14 @@
  */
 package org.smooks.cartridges.routing.jms.message.creationstrategies;
 
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-
-import org.smooks.SmooksException;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ExecutionContext;
 
 /**
  *
@@ -80,7 +80,7 @@ public class TextMessageCreationStrategy implements MessageCreationStrategy
 		catch (JMSException e)
 		{
 			final String errorMsg = "JMSException while trying to create TextMessae";
-			throw new SmooksConfigurationException( errorMsg, e );
+			throw new SmooksConfigException( errorMsg, e );
 		}
 	}
 

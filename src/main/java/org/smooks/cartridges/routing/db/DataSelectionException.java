@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.routing.db;
 
-import org.smooks.SmooksException;
+import org.smooks.api.SmooksException;
 
 /**
  * Data selection exception.

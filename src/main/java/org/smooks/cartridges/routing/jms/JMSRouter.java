@@ -44,21 +44,21 @@ package org.smooks.cartridges.routing.jms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smooks.SmooksException;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.resource.visitor.VisitAfterIf;
+import org.smooks.api.resource.visitor.VisitBeforeIf;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cartridges.routing.SmooksRoutingException;
 import org.smooks.cartridges.routing.jms.message.creationstrategies.MessageCreationStrategy;
 import org.smooks.cartridges.routing.jms.message.creationstrategies.StrategyFactory;
 import org.smooks.cartridges.routing.jms.message.creationstrategies.TextMessageCreationStrategy;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.VisitAfterIf;
-import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.delivery.sax.ng.BeforeVisitor;
-import org.smooks.util.FreeMarkerTemplate;
-import org.smooks.util.FreeMarkerUtils;
+import org.smooks.support.FreeMarkerTemplate;
+import org.smooks.support.FreeMarkerUtils;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -197,15 +197,15 @@ public class JMSRouter implements BeforeVisitor, AfterVisitor, Consumer {
     private Session session;
 
     @PostConstruct
-    public void initialize() throws SmooksConfigurationException, JMSException {
+    public void initialize() throws SmooksConfigException, JMSException {
         Context context = null;
         boolean initialized = false;
 
         if (beanId == null) {
-            throw new SmooksConfigurationException("Mandatory 'beanId' property not defined.");
+            throw new SmooksConfigException("Mandatory 'beanId' property not defined.");
         }
         if (jmsProperties.getDestinationName() == null) {
-            throw new SmooksConfigurationException("Mandatory 'destinationName' property not defined.");
+            throw new SmooksConfigException("Mandatory 'destinationName' property not defined.");
         }
 
         try {
@@ -226,7 +226,7 @@ public class JMSRouter implements BeforeVisitor, AfterVisitor, Consumer {
         } catch (NamingException e) {
             final String errorMsg = "NamingException while trying to lookup [" + jmsProperties.getDestinationName() + "]";
             LOGGER.error(errorMsg, e);
-            throw new SmooksConfigurationException(errorMsg, e);
+            throw new SmooksConfigException(errorMsg, e);
         } finally {
             if (context != null) {
                 try {
@@ -394,11 +394,11 @@ public class JMSRouter implements BeforeVisitor, AfterVisitor, Consumer {
         } catch (JMSException e) {
             final String errorMsg = "JMSException while trying to create MessageProducer for Queue [" + jmsProperties.getDestinationName() + "]";
             releaseJMSResources();
-            throw new SmooksConfigurationException(errorMsg, e);
+            throw new SmooksConfigException(errorMsg, e);
         } catch (NamingException e) {
             final String errorMsg = "NamingException while trying to lookup ConnectionFactory [" + jmsProperties.getConnectionFactoryName() + "]";
             releaseJMSResources();
-            throw new SmooksConfigurationException(errorMsg, e);
+            throw new SmooksConfigException(errorMsg, e);
         }
 
         return msgProducer;
@@ -414,7 +414,7 @@ public class JMSRouter implements BeforeVisitor, AfterVisitor, Consumer {
      * <p>
      * Subclasses may override this behaviour.
      */
-    protected void setMessageProducerProperties() throws SmooksConfigurationException {
+    protected void setMessageProducerProperties() throws SmooksConfigException {
         try {
             msgProducer.setTimeToLive(jmsProperties.getTimeToLive());
             msgProducer.setPriority(jmsProperties.getPriority());
@@ -423,7 +423,7 @@ public class JMSRouter implements BeforeVisitor, AfterVisitor, Consumer {
             msgProducer.setDeliveryMode(deliveryModeInt);
         } catch (JMSException e) {
             final String errorMsg = "JMSException while trying to set JMS Header Fields";
-            throw new SmooksConfigurationException(errorMsg, e);
+            throw new SmooksConfigException(errorMsg, e);
         }
     }
 

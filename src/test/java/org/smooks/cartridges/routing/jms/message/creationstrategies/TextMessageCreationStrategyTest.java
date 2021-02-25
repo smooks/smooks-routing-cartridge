@@ -42,25 +42,24 @@
  */
 package org.smooks.cartridges.routing.jms.message.creationstrategies;
 
-import static org.testng.AssertJUnit.*;
-
-import java.io.IOException;
+import com.mockrunner.mock.jms.JMSMockObjectFactory;
+import com.mockrunner.mock.jms.MockConnectionFactory;
+import org.smooks.cartridges.routing.jms.TestBean;
+import org.smooks.cartridges.routing.util.RouterTestHelper;
+import org.smooks.tck.MockExecutionContext;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
-import org.smooks.cartridges.routing.jms.TestBean;
-import org.smooks.cartridges.routing.util.RouterTestHelper;
-import org.smooks.container.MockExecutionContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.xml.sax.SAXException;
-
-import com.mockrunner.mock.jms.JMSMockObjectFactory;
-import com.mockrunner.mock.jms.MockConnectionFactory;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  *

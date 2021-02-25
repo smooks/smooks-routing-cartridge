@@ -42,18 +42,19 @@
  */
 package org.smooks.cartridges.routing.file;
 
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.smooks.Smooks;
 import org.xml.sax.SAXException;
-import org.custommonkey.xmlunit.XMLUnit;
 
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>

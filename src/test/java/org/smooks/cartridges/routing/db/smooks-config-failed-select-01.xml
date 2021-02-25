@@ -45,7 +45,7 @@
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd">
 
     <resource-config selector="#document">
-        <resource>org.smooks.db.DirectDataSource</resource>
+        <resource>org.smooks.engine.db.DirectDataSource</resource>
         <param name="datasource">OrdersDS</param>
         <param name="driver">org.hsqldb.jdbcDriver</param>
         <param name="url">jdbc:hsqldb:hsql://localhost:9992/milyn-hsql-9992</param>

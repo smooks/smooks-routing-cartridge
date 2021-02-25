@@ -42,7 +42,7 @@
  */
 package org.smooks.cartridges.routing;
 
-import org.smooks.SmooksException;
+import org.smooks.api.SmooksException;
 
 /**
  * Smooks routing exception.

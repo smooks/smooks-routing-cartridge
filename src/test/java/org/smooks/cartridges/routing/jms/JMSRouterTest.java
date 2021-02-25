@@ -47,17 +47,18 @@ import com.mockrunner.mock.jms.JMSMockObjectFactory;
 import com.mockrunner.mock.jms.MockQueue;
 import com.mockrunner.mock.jms.MockQueueConnectionFactory;
 import org.mockejb.jndi.MockContextFactory;
+import org.smooks.api.Registry;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.lifecycle.LifecycleManager;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.routing.SmooksRoutingException;
 import org.smooks.cartridges.routing.util.RouterTestHelper;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.container.MockApplicationContext;
-import org.smooks.container.MockExecutionContext;
-import org.smooks.injector.Scope;
-import org.smooks.lifecycle.LifecycleManager;
-import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.registry.Registry;
-import org.smooks.registry.lookup.LifecycleManagerLookup;
+import org.smooks.engine.injector.Scope;
+import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
+import org.smooks.engine.lookup.LifecycleManagerLookup;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
+import org.smooks.tck.MockApplicationContext;
+import org.smooks.tck.MockExecutionContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Element;
@@ -93,9 +94,9 @@ public class JMSRouterTest {
         lifecycleManager = registry.lookup(new LifecycleManagerLookup());
     }
 
-    @Test(groups = "integration", expectedExceptions = SmooksConfigurationException.class)
+    @Test(groups = "integration", expectedExceptions = SmooksConfigException.class)
     public void configureWithMissingDestinationType() {
-        ResourceConfig config = new ResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
         JMSRouter jmsRouter = new JMSRouter();
         lifecycleManager.applyPhase(jmsRouter, new PostConstructLifecyclePhase(new Scope(registry, config, jmsRouter)));
     }
@@ -108,7 +109,7 @@ public class JMSRouterTest {
 
         final MockExecutionContext executionContext = RouterTestHelper.createExecutionContext(beanId, bean);
 
-        ResourceConfig config = new ResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
         config.setParameter("destinationName", queueName);
         config.setParameter("beanId", beanId);
         final JMSRouter router = new JMSRouter();
@@ -132,7 +133,7 @@ public class JMSRouterTest {
 
         final MockExecutionContext executionContext = RouterTestHelper.createExecutionContext(beanId, bean);
 
-        ResourceConfig config = new ResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
         config.setParameter("destinationName", queueName);
         config.setParameter("beanId", beanId);
         config.setParameter("highWaterMark", "3");
@@ -169,7 +170,7 @@ public class JMSRouterTest {
 
         final MockExecutionContext executionContext = RouterTestHelper.createExecutionContext(beanId, bean);
 
-        ResourceConfig config = new ResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
         config.setParameter("destinationName", queueName);
         config.setParameter("beanId", beanId);
         config.setParameter("highWaterMark", "3");
@@ -194,7 +195,7 @@ public class JMSRouterTest {
     @Test(groups = "unit")
     public void setJndiContextFactory() {
         final String contextFactory = MockContextFactory.class.getName();
-        ResourceConfig config = new ResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
         setManadatoryProperties(config);
         config.setParameter("jndiContextFactory", contextFactory);
         final JMSRouter router = new JMSRouter();
@@ -207,7 +208,7 @@ public class JMSRouterTest {
     @Test(groups = "unit")
     public void setJndiProviderUrl() {
         final String providerUrl = "jnp://localhost:1099";
-        ResourceConfig config = new ResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
         setManadatoryProperties(config);
         config.setParameter("jndiProviderUrl", providerUrl);
         final JMSRouter router = new JMSRouter();
@@ -221,7 +222,7 @@ public class JMSRouterTest {
     public void setJndiNamingFactoryUrl() {
         final String namingFactoryUrlPkgs = "org.jboss.naming:org.jnp.interfaces";
 
-        ResourceConfig config = new ResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
         setManadatoryProperties(config);
         config.setParameter("jndiNamingFactoryUrl", namingFactoryUrlPkgs);
         final JMSRouter router = new JMSRouter();

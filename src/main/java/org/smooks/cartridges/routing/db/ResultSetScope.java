@@ -42,9 +42,9 @@
  */
 package org.smooks.cartridges.routing.db;
 
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.ApplicationContext;
 import org.smooks.Smooks;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
 
 /**
  * Database Resultset lifecycle scope for Resultsets created by the

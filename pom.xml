@@ -42,6 +42,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
+        <smooks.version>2.0.0-M3-SNAPSHOT</smooks.version>
     </properties>
 
     <build>
@@ -190,15 +191,14 @@
     <dependencies>
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
-            <artifactId>smooks-javabean-cartridge</artifactId>
-            <version>2.0.0-M3-SNAPSHOT</version>
+            <artifactId>smooks-templating-cartridge</artifactId>
+            <version>${smooks.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.smooks.cartridges</groupId>
-            <artifactId>smooks-templating-cartridge</artifactId>
-            <version>2.0.0-M3-SNAPSHOT</version>
+            <groupId>org.smooks</groupId>
+            <artifactId>smooks-tck</artifactId>
+            <version>${smooks.version}</version>
         </dependency>
-
         <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>jms-api</artifactId>

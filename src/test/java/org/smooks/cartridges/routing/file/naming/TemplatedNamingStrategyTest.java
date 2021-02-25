@@ -42,14 +42,14 @@
  */
 package org.smooks.cartridges.routing.file.naming;
 
-import static org.testng.AssertJUnit.*;
-
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * Unit test for TemplatedNamingStrategy

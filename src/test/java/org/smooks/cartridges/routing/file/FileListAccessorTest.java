@@ -42,13 +42,14 @@
  */
 package org.smooks.cartridges.routing.file;
 
-import static org.testng.AssertJUnit.*;
+import org.smooks.tck.MockExecutionContext;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.List;
 
-import org.smooks.container.MockExecutionContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * 	Unit test for FileListAccessor

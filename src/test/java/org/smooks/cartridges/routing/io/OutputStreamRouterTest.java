@@ -42,13 +42,14 @@
  */
 package org.smooks.cartridges.routing.io;
 
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.container.MockApplicationContext;
-import org.smooks.injector.Scope;
-import org.smooks.lifecycle.LifecycleManager;
-import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.registry.Registry;
-import org.smooks.registry.lookup.LifecycleManagerLookup;
+import org.smooks.api.Registry;
+import org.smooks.api.lifecycle.LifecycleManager;
+import org.smooks.api.resource.config.ResourceConfig;
+import org.smooks.engine.injector.Scope;
+import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
+import org.smooks.engine.lookup.LifecycleManagerLookup;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
+import org.smooks.tck.MockApplicationContext;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -60,9 +61,8 @@ import static org.testng.AssertJUnit.assertEquals;
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>
  *
  */
-@Test ( groups = "unit" )
-public class OutputStreamRouterTest
-{
+@Test(groups = "unit")
+public class OutputStreamRouterTest {
 	private String resourceName = "testResource";
 	private String beanId = "testBeanId";
 	private OutputStreamRouter router = new OutputStreamRouter();
@@ -72,28 +72,22 @@ public class OutputStreamRouterTest
 	public void configure() {
 		Registry registry = new MockApplicationContext().getRegistry();
 		LifecycleManager lifecycleManager = registry.lookup(new LifecycleManagerLookup());
-		
+
 		lifecycleManager.applyPhase(router, new PostConstructLifecyclePhase(new Scope(registry, config, router)));
-		
+
 		assertEquals(resourceName, router.getResourceName());
 	}
-	
+
 	@BeforeTest
-	public void setup()
-	{
-		config = createConfig( resourceName, beanId );
-	}
-	
-	//	private
-	
-	private ResourceConfig createConfig( 
-			final String resourceName,
-			final String beanId)
-	{
-		ResourceConfig config = new ResourceConfig( "x", OutputStreamRouter.class.getName() );
-		config.setParameter( "resourceName", resourceName );
-		config.setParameter( "beanId", beanId );
-		return config;
+	public void setup() {
+		config = createConfig(resourceName, beanId);
 	}
 
+
+	private ResourceConfig createConfig(final String resourceName, final String beanId) {
+		ResourceConfig config = new DefaultResourceConfig("x", OutputStreamRouter.class.getName());
+		config.setParameter("resourceName", resourceName);
+		config.setParameter("beanId", beanId);
+		return config;
+	}
 }
