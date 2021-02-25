@@ -42,10 +42,10 @@
  */
 package org.smooks.cartridges.routing.jms;
 
-import javax.jms.MessageListener;
 import javax.jms.Message;
-import java.util.List;
+import javax.jms.MessageListener;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test listener.

@@ -42,12 +42,12 @@
  */
 package org.smooks.cartridges.routing.db;
 
+import org.smooks.api.SmooksConfigException;
 import org.smooks.assertion.AssertArgument;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.util.DollarBraceDecoder;
-import org.smooks.util.MVELTemplate;
+import org.smooks.cartridges.javabean.BeanMapExpressionEvaluator;
+import org.smooks.support.DollarBraceDecoder;
+import org.smooks.support.MVELTemplate;
 import org.smooks.xml.XmlUtil;
-import org.smooks.javabean.expression.BeanMapExpressionEvaluator;
 
 import java.sql.*;
 import java.util.*;
@@ -59,13 +59,14 @@ import java.util.*;
  */
 public class StatementExec {
 
+    private final StatementType statementType;
+    private final boolean isJoin;
+    private final List<BeanMapExpressionEvaluator> statementExpressionEvaluators = new ArrayList<>();
+    
     private String statement;
-    private StatementType statementType;
-    private boolean isJoin;
-    private List<BeanMapExpressionEvaluator> statementExpressionEvaluators = new ArrayList<BeanMapExpressionEvaluator>();
     private MVELTemplate updateStatementTemplate;
 
-    public StatementExec(String statementString) throws SmooksConfigurationException {
+    public StatementExec(String statementString) throws SmooksConfigException {
         AssertArgument.isNotNull(statementString, "statementString");
 
         statement = XmlUtil.removeEntities(statementString).trim();

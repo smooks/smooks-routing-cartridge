@@ -44,18 +44,18 @@ package org.smooks.cartridges.routing.file;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smooks.SmooksException;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.TypedKey;
+import org.smooks.api.expression.ExpressionEvaluator;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cartridges.routing.SmooksRoutingException;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.TypedKey;
-import org.smooks.expression.ExpressionEvaluator;
-import org.smooks.expression.MVELExpressionEvaluator;
+import org.smooks.engine.expression.MVELExpressionEvaluator;
 import org.smooks.io.AbstractOutputStreamResource;
-import org.smooks.util.DollarBraceDecoder;
-import org.smooks.util.FreeMarkerTemplate;
-import org.smooks.util.FreeMarkerUtils;
+import org.smooks.support.DollarBraceDecoder;
+import org.smooks.support.FreeMarkerTemplate;
+import org.smooks.support.FreeMarkerUtils;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -203,12 +203,12 @@ public class FileOutputStreamResource extends AbstractOutputStreamResource {
     }
 
     @PostConstruct
-    public void initialize() throws SmooksConfigurationException {
+    public void initialize() throws SmooksConfigException {
         if (fileNamePattern == null) {
-            throw new SmooksConfigurationException("Null 'fileNamePattern' configuration parameter.");
+            throw new SmooksConfigException("Null 'fileNamePattern' configuration parameter.");
         }
         if (destinationDirectoryPattern == null) {
-            throw new SmooksConfigurationException("Null 'destinationDirectoryPattern' configuration parameter.");
+            throw new SmooksConfigException("Null 'destinationDirectoryPattern' configuration parameter.");
         }
 
         fileNameTemplate = new FreeMarkerTemplate(fileNamePattern);

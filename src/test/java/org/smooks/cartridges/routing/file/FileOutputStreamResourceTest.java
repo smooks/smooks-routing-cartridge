@@ -43,24 +43,25 @@
 package org.smooks.cartridges.routing.file;
 
 import org.smooks.Smooks;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.Registry;
+import org.smooks.api.lifecycle.LifecycleManager;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.templating.TemplatingConfiguration;
 import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.MockApplicationContext;
-import org.smooks.container.MockExecutionContext;
-import org.smooks.container.standalone.DefaultApplicationContextBuilder;
-import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.injector.Scope;
+import org.smooks.engine.DefaultApplicationContextBuilder;
+import org.smooks.engine.delivery.fragment.NodeFragment;
+import org.smooks.engine.injector.Scope;
+import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
+import org.smooks.engine.lookup.LifecycleManagerLookup;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
+import org.smooks.engine.resource.visitor.smooks.NestedSmooksVisitor;
 import org.smooks.io.FileUtils;
 import org.smooks.io.ResourceOutputStream;
-import org.smooks.lifecycle.LifecycleManager;
-import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.payload.StringSource;
-import org.smooks.registry.Registry;
-import org.smooks.registry.lookup.LifecycleManagerLookup;
-import org.smooks.visitors.smooks.NestedSmooksVisitor;
+import org.smooks.io.payload.StringSource;
+import org.smooks.tck.MockApplicationContext;
+import org.smooks.tck.MockExecutionContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -238,7 +239,7 @@ public class FileOutputStreamResourceTest {
             final String fileName,
             final String destinationDirectory,
             final String listFileName) {
-        ResourceConfig config = new ResourceConfig("x", FileOutputStreamResource.class.getName());
+        ResourceConfig config = new DefaultResourceConfig("x", FileOutputStreamResource.class.getName());
         config.setParameter("resourceName", resourceName);
         config.setParameter("fileNamePattern", fileName);
         config.setParameter("destinationDirectoryPattern", destinationDirectory);

@@ -42,7 +42,7 @@
   =========================LICENSE_END==================================
   -->
 
-<COMP_FIDS xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.comp.aero/fids">
+<COMP_FIDS xmlns="http://www.comp.aero/fids">
     <Flight>
         <SourceIdentification>COMP_STANDARD_FIDS</SourceIdentification>
         <ActionCode>A</ActionCode>

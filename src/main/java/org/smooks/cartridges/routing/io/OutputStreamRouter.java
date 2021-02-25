@@ -42,20 +42,20 @@
  */
 package org.smooks.cartridges.routing.io;
 
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.resource.visitor.VisitAfterIf;
+import org.smooks.api.resource.visitor.VisitBeforeIf;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.cartridges.routing.file.FileOutputStreamResource;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.VisitAfterIf;
-import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.delivery.sax.ng.BeforeVisitor;
 import org.smooks.io.AbstractOutputStreamResource;
 import org.smooks.io.ResourceOutputStream;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.repository.BeanId;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -117,7 +117,7 @@ public class OutputStreamRouter implements BeforeVisitor, AfterVisitor, Consumer
     private ApplicationContext applicationContext;
 
     @PostConstruct
-    public void initialize() throws SmooksConfigurationException {
+    public void initialize() throws SmooksConfigException {
     	beanId = applicationContext.getBeanIdStore().getBeanId(beanIdName);
     }
 

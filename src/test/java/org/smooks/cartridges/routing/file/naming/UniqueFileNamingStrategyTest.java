@@ -42,9 +42,9 @@
  */
 package org.smooks.cartridges.routing.file.naming;
 
-import static org.testng.AssertJUnit.*;
-
 import org.testng.annotations.Test;
+
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * Test for class DefaultNamingStrategy

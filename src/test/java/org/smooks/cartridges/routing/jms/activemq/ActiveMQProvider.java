@@ -44,9 +44,9 @@ package org.smooks.cartridges.routing.jms.activemq;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.jndi.ActiveMQInitialContextFactory;
-import org.smooks.util.JNDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smooks.cartridges.routing.JNDIUtil;
 
 import javax.jms.*;
 import javax.naming.Context;

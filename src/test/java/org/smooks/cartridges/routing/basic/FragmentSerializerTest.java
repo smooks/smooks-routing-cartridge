@@ -46,10 +46,10 @@ import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.smooks.Smooks;
-import org.smooks.SmooksException;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.payload.JavaResult;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.io.payload.JavaResult;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 

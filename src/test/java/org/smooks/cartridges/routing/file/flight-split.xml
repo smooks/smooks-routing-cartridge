@@ -58,7 +58,7 @@
     </params>
 
     <resource-config selector="Flight">
-        <resource>org.smooks.delivery.DomModelCreator</resource>
+        <resource>org.smooks.engine.resource.visitor.dom.DomModelCreator</resource>
     </resource-config>
 
     <!-- Apply a template to each "Flight" NodeModel (captured above), outputting to the file stream (below) -->

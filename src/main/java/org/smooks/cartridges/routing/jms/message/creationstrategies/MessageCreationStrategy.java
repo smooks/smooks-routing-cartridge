@@ -42,11 +42,11 @@
  */
 package org.smooks.cartridges.routing.jms.message.creationstrategies;
 
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+
 import javax.jms.Message;
 import javax.jms.Session;
-
-import org.smooks.SmooksException;
-import org.smooks.container.ExecutionContext;
 
 /**
  * A Strategy for creating different kinds of JMS Message objects from

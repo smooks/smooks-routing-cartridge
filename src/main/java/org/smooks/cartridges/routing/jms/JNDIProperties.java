@@ -42,13 +42,13 @@
  */
 package org.smooks.cartridges.routing.jms;
 
-import org.smooks.util.JNDIUtil;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.cartridges.routing.JNDIUtil;
 import org.smooks.resource.URIResourceLocator;
-import org.smooks.cdr.SmooksConfigurationException;
 
 import javax.naming.Context;
-import java.util.Properties;
 import java.io.IOException;
+import java.util.Properties;
 
 
 public class JNDIProperties
@@ -103,7 +103,7 @@ public class JNDIProperties
         this.propertiesFile = propertiesFile;
     }
 
-    public Properties toProperties() throws SmooksConfigurationException {
+    public Properties toProperties() throws SmooksConfigException {
         if(properties == null) {
             properties = new Properties();
         }
@@ -113,7 +113,7 @@ public class JNDIProperties
                 URIResourceLocator locator = new URIResourceLocator();
                 properties.load(locator.getResource(propertiesFile));
             } catch (IOException e) {
-                throw new SmooksConfigurationException("Failed to read JMS JNDI properties file '" + propertiesFile + "'.", e);
+                throw new SmooksConfigException("Failed to read JMS JNDI properties file '" + propertiesFile + "'.", e);
             }
         }
 

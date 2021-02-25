@@ -42,24 +42,24 @@
  */
 package org.smooks.cartridges.routing.db;
 
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.delivery.ordering.Producer;
+import org.smooks.api.resource.visitor.VisitAfterIf;
+import org.smooks.api.resource.visitor.VisitAfterReport;
+import org.smooks.api.resource.visitor.VisitBeforeIf;
+import org.smooks.api.resource.visitor.VisitBeforeReport;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.assertion.AssertArgument;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.db.AbstractDataSource;
-import org.smooks.delivery.annotation.VisitAfterIf;
-import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.delivery.sax.ng.BeforeVisitor;
-import org.smooks.event.report.annotation.VisitAfterReport;
-import org.smooks.event.report.annotation.VisitBeforeReport;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.repository.BeanId;
-import org.smooks.util.CollectionsUtil;
+import org.smooks.engine.db.AbstractDataSource;
+import org.smooks.engine.delivery.fragment.NodeFragment;
+import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -150,10 +150,10 @@ public class SQLExecutor implements BeforeVisitor, AfterVisitor, Producer, Consu
     }
 
     @PostConstruct
-    public void postConstruct() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigException {
         statementExec = new StatementExec(statement);
         if (statementExec.getStatementType() == StatementType.QUERY && !resultSetName.isPresent()) {
-            throw new SmooksConfigurationException("Sorry, query statements must be accompanied by a 'resultSetName' property, under whose value the query results are bound.");
+            throw new SmooksConfigException("Sorry, query statements must be accompanied by a 'resultSetName' property, under whose value the query results are bound.");
         }
 
         if (resultSetName.isPresent()) {

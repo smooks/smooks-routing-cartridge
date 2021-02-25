@@ -42,7 +42,7 @@
   =========================LICENSE_END==================================
   -->
 
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
     <soapenv:Header>
     </soapenv:Header>
     <soapenv:Body>

@@ -44,25 +44,25 @@ package org.smooks.cartridges.routing.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.context.BeanIdStore;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.delivery.ordering.Producer;
+import org.smooks.api.expression.ExpressionEvaluator;
+import org.smooks.api.resource.visitor.VisitAfterIf;
+import org.smooks.api.resource.visitor.VisitBeforeIf;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
+import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.assertion.AssertArgument;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.VisitAfterIf;
-import org.smooks.delivery.annotation.VisitBeforeIf;
-import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.ordering.Producer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.delivery.sax.ng.BeforeVisitor;
-import org.smooks.expression.ExpressionEvaluator;
-import org.smooks.expression.MVELExpressionEvaluator;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.context.BeanIdStore;
-import org.smooks.javabean.repository.BeanId;
-import org.smooks.util.CollectionsUtil;
-import org.smooks.util.FreeMarkerTemplate;
+import org.smooks.engine.delivery.fragment.NodeFragment;
+import org.smooks.engine.expression.MVELExpressionEvaluator;
+import org.smooks.support.CollectionsUtil;
+import org.smooks.support.FreeMarkerTemplate;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -153,7 +153,7 @@ public class ResultSetRowSelector implements BeforeVisitor, AfterVisitor, Produc
     }
     
     @PostConstruct
-    public void postConstruct() throws SmooksConfigurationException {
+    public void postConstruct() throws SmooksConfigException {
     	BeanIdStore beanIdStore = appContext.getBeanIdStore();
 
     	beanIdObj = beanIdStore.register(beanId);

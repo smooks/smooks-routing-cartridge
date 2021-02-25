@@ -43,7 +43,7 @@
 package org.smooks.cartridges.routing.file.naming;
 
 import freemarker.template.TemplateException;
-import org.smooks.util.FreeMarkerTemplate;
+import org.smooks.support.FreeMarkerTemplate;
 
 /**
  * TemplatedNamingStrategy uses FreeMarker to generate a file name from
