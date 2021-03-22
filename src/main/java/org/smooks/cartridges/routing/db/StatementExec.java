@@ -47,7 +47,7 @@ import org.smooks.assertion.AssertArgument;
 import org.smooks.cartridges.javabean.BeanMapExpressionEvaluator;
 import org.smooks.support.DollarBraceDecoder;
 import org.smooks.support.MVELTemplate;
-import org.smooks.xml.XmlUtil;
+import org.smooks.support.XmlUtil;
 
 import java.sql.*;
 import java.util.*;
