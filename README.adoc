@@ -192,9 +192,9 @@ Smooks Resource configuration #4 defines the FreeMarker templating resource used
 
 == Routing to JMS
 
-JMS routing is performed via the `+<jms:router]+` configuration from the `+https://www.smooks.org/xsd/smooks/jms-routing-2.0.xsd+` configuration namespace.
+JMS routing is performed via the `+<jms:router>+` configuration from the `+https://www.smooks.org/xsd/smooks/jms-routing-2.0.xsd+` configuration namespace.
 
-The following is an example `+<jms:router]+` configuration that routes an `+orderItem_xml+` bean to a JMS Queue named `+smooks.exampleQueue+` (also read the "Routing to File" example):
+The following is an example `+<jms:router>+` configuration that routes an `+orderItem_xml+` bean to a JMS Queue named `+smooks.exampleQueue+` (also read the "Routing to File" example):
 
 .smooks-config.xml
 [source,xml]
@@ -246,7 +246,7 @@ In this case, we route the result of a FreeMarker templating operation to the JM
     <version>2.0.0-M3</version>
 </dependency>
 ----
-// end::smooks-camel-cartridge[]
+// end::smooks-routing-cartridge[]
 
 == License
 
