@@ -4,9 +4,8 @@ image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-routin
 image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-routing-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
 image:https://github.com/smooks/smooks-routing-cartridge/workflows/CI/badge.svg[Build Status]
 
-// tag::smooks-routing-cartridge[]
 A common approach to processing large/huge messages is to split them out into smaller messages that can be processed independently. Of course splitting and routing is not just a solution for processing huge
-messages. It's often needed with smaller messages as well (message size may be irrelevant) where, for example, order items in an order message need to be split out and routed (based on content - "Content Base Routing") to different departments or partners for processing. Under these conditions, the message formats required at the different destinations may also vary e.g.,
+messages. It's often needed with smaller messages as well (message size may be irrelevant) where, for example, order items in an order message need to be split out and routed (based on content - "Content Base Routing") to different departments or partners for processin g. Under these conditions, the message formats required at the different destinations may also vary e.g.,
 
 * "destination1" required XML via the file system,
 * "destination2" requires Java objects via a JMS Queue,
@@ -33,9 +32,9 @@ As for points #1 and #2 above specifically, Smooks offers two approaches to crea
 * Allows for more complex splits, with the ability to merge data from multiple source fragments into each split message e.g. not just the fragments, but the order info too.
 * Allows for splitting and routing of Java Objects as the Split messages (e.g., over JMS).
 
-With the more complex approach outlined above, the key to processing huge messages (not an issue for the more basic approach) is to make sure that you always maintain a small memory footprint. You can do this using the JavaBean Cartridge by making sure you're only binding the most relevant message data (into the bean context) at any one time. In the following sections, the examples are all based on splitting and routing of order-items out of an order message. The solutions shown all work for huge messages because the Smooks JavaBean Cartridge binding configurations are implemented such that the only data held in memory at any given time is the main order details (order header etc...), and the
-"current" order item details.
+With the more complex approach outlined above, the key to processing huge messages (not an issue for the more basic approach) is to make sure that you always maintain a small memory footprint. You can do this using the JavaBean Cartridge by making sure you're only binding the most relevant message data (into the bean context) at any one time. In the following sections, the examples are all based on splitting and routing of order-items out of an order message. The solutions shown all work for huge messages because the Smooks JavaBean Cartridge binding configurations are implemented such that the only data held in memory at any given time is the main order details (order header etc...), and the  "current" order item details.
 
+// tag::basic-splitting-and-routing[]
 == Basic Splitting and Routing
 
 As stated above, the easiest way to split and route fragments of a message is to use the basic `+<frag:serialize>+` and _<*:router>_ components (`+<jms:router>+`, `+<file:router>+`, etc...) from the Routing Cartridge. The `+<frag:serialize>+` component has its own configuration in the `+https://www.smooks.org/xsd/smooks/fragment-routing-1.5.xsd+` namespace.
@@ -101,7 +100,9 @@ The following is a quick example, showing the config for routing split messages 
 ----
 
 For more details on the JMS routing aspects of the above example, see the JMS Router documentation (below). The <jms:router> could be substituted for any of the other routers e.g. if using with JBoss ESB, you could use the `+<esbr:routeBean>+` configuration to route the split message to any ESB endpoint.
+// end::basic-splitting-and-routing[]
 
+// tag::routing-to-file[]
 == Routing to File
 
 File based routing is performed via the `+<file:outputStream>+` configuration from the
@@ -189,7 +190,9 @@ Smooks Resource configuration #4 defines the FreeMarker templating resource used
     </details>
 </orderitem>
 ----
+// end::routing-to-file[]
 
+// tag::routing-to-jms[]
 == Routing to JMS
 
 JMS routing is performed via the `+<jms:router>+` configuration from the `+https://www.smooks.org/xsd/smooks/jms-routing-2.0.xsd+` configuration namespace.
@@ -234,6 +237,7 @@ The following is an example `+<jms:router>+` configuration that routes an `+orde
 ----
 
 In this case, we route the result of a FreeMarker templating operation to the JMS Queue (i.e. as a String). We could also have routed a full Object Model, in which case it would be routed as a Serialized ObjectMessage.
+// end::routing-to-jms[]
 
 == Maven Coordinates
 
@@ -246,7 +250,6 @@ In this case, we route the result of a FreeMarker templating operation to the JM
     <version>2.0.0-M3</version>
 </dependency>
 ----
-// end::smooks-routing-cartridge[]
 
 == License
 
