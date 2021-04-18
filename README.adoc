@@ -233,6 +233,117 @@ The following is an example `+<jms:router>+` configuration that routes an `+orde
 ----
 
 In this case, we route the result of a FreeMarker templating operation to the JMS Queue (i.e. as a String). We could also have routed a full Object Model, in which case it would be routed as a Serialized ObjectMessage.
+
+== SQL
+
+Routing to a database is also quite easy. So we take the same scenario as with the File Routing example above, but this time we want to route the order and order item data to a database. This is what we want to achieve:
+
+image:docs/images/Db-split-required.png[Image:db-split-required.png]
+
+First we need to define a set of Java bindings that extract the order and order-item data from the data stream:
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd">
+
+    <!-- Extract the order data... -->
+    <jb:bean beanId="order" class="java.util.Hashtable" createOnElement="order">
+        <jb:value property="orderId" decoder="Integer" data="order/@id"/>
+        <jb:value property="customerNumber" decoder="Long" data="header/customer/@number"/>
+        <jb:value property="customerName" data="header/customer"/>
+    </jb:bean>
+
+    <!-- Extract the order-item data... -->
+    <jb:bean beanId="orderItem" class="java.util.Hashtable" createOnElement="order-item">
+        <jb:value property="itemId" decoder="Integer" data="order-item/@id"/>
+        <jb:value property="productId" decoder="Long" data="order-item/product"/>
+        <jb:value property="quantity" decoder="Integer" data="order-item/quantity"/>
+        <jb:value property="price" decoder="Double" data="order-item/price"/>
+    </jb:bean>
+
+</smooks-resource-list>
+----
+
+Next we need to define datasource configuration and a number of <db:executor> configurations that will use that datasource to insert the data that was bound into the Java Object model into the database.
+
+The Datasource configuration (namespace https://www.smooks.org/xsd/smooks/datasource-1.5.xsd) for retrieving direct database connection:
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:ds="https://www.smooks.org/xsd/smooks/datasource-1.5.xsd">
+
+    <ds:direct bindOnElement="#document"
+              datasource="DBExtractTransformLoadDS"
+              driver="org.hsqldb.jdbcDriver"
+              url="jdbc:hsqldb:hsql://localhost:9201/smooks-hsql-9201"
+              username="sa"
+              password=""
+              autoCommit="false"/>
+
+</smooks-resource-list>
+----
+
+or it is possible to use a JNDI datasource for retrieving a database connection:
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:ds="https://www.smooks.org/xsd/smooks/datasource-1.5.xsd">
+
+    <!-- This JNDI datasource can handle JDBC and JTA transactions or
+         it can leave the transaction managment to an other external component.
+         An external component could be an other Smooks visitor, the EJB transaction manager
+         or you can do it your self. -->
+    <ds:JNDI
+         bindOnElement="#document"
+         datasource="DBExtractTransformLoadDS"
+         datasourceJndi="java:/someDS"
+         transactionManager="JTA"
+         transactionJndi="java:/mockTransaction"
+         targetProfile="jta"/>
+
+</smooks-resource-list>
+----
+
+The datasource schema describes and documents how you can configure the datasource.
+
+The <db:executor> configurations (namespace https://www.smooks.org/xsd/smooks/db-routing-2.0.xsd):
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:db="https://www.smooks.org/xsd/smooks/db-routing-2.0.xsd">
+
+    <!-- Assert whether it's an insert or update. Need to do this just before we do the insert/update... -->
+    <db:executor executeOnElement="order-items" datasource="DBExtractTransformLoadDS" executeBefore="true">
+        <db:statement>select OrderId from ORDERS where OrderId = ${order.orderId}</db:statement>
+        <db:resultSet name="orderExistsRS"/>
+    </db:executor>
+
+    <!-- If it's an insert (orderExistsRS.isEmpty()), insert the order before we process the order items... -->
+    <db:executor executeOnElement="order-items" datasource="DBExtractTransformLoadDS" executeBefore="true">
+        <condition>orderExistsRS.isEmpty()</condition>
+        <db:statement>INSERT INTO ORDERS VALUES(${order.orderId}, ${order.customerNumber}, ${order.customerName})</db:statement>
+    </db:executor>
+
+    <!-- And insert each orderItem... -->
+    <db:executor executeOnElement="order-item" datasource="DBExtractTransformLoadDS" executeBefore="false">
+        <condition>orderExistsRS.isEmpty()</condition>
+        <db:statement>INSERT INTO ORDERITEMS VALUES (${orderItem.itemId}, ${order.orderId}, ${orderItem.productId}, ${orderItem.quantity}, ${orderItem.price})</db:statement>
+    </db:executor>
+
+    <!-- Ignoring updates for now!! -->
+
+</smooks-resource-list>
+----
+
+Check out the db-extract-transform-load example.
 // end::smooks-routing-cartridge[]
 
 == Maven Coordinates
