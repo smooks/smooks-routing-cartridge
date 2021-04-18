@@ -234,7 +234,7 @@ The following is an example `+<jms:router>+` configuration that routes an `+orde
 
 In this case, we route the result of a FreeMarker templating operation to the JMS Queue (i.e. as a String). We could also have routed a full Object Model, in which case it would be routed as a Serialized ObjectMessage.
 
-== SQL
+== Database
 
 Routing to a database is also quite easy. So we take the same scenario as with the File Routing example above, but this time we want to route the order and order item data to a database. This is what we want to achieve:
 
