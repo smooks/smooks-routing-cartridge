@@ -44,10 +44,10 @@ package org.smooks.cartridges.routing.jms.message.creationstrategies;
 
 import com.mockrunner.mock.jms.JMSMockObjectFactory;
 import com.mockrunner.mock.jms.MockConnectionFactory;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.smooks.cartridges.routing.util.RouterTestHelper;
 import org.smooks.tck.MockExecutionContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
@@ -59,15 +59,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  * @author <a href="mailto:maurice.zeijen@smies.com">maurice.zeijen@smies.com</a>
  *
  */
-@Test ( groups = "unit" )
 public class MapMessageCreationStrategyTest
 {
 	private final MapMessageCreationStrategy strategy = new MapMessageCreationStrategy();

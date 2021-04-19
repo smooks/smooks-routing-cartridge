@@ -46,6 +46,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.smooks.Smooks;
+import org.smooks.support.StreamUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamSource;
@@ -62,7 +63,7 @@ import static org.junit.Assert.assertTrue;
 public class FlightSplitTest {
 
     @Before
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         new File("target/flights/BA-1234.xml").delete();
         new File("target/flights/BA-5678.xml").delete();
     }
@@ -79,18 +80,7 @@ public class FlightSplitTest {
 
         XMLUnit.setIgnoreWhitespace(true);
 
-        FileReader fileReader = new FileReader(new File("target/flights/BA-1234.xml"));
-        try {
-            assertTrue(XMLUnit.compareXML(fileReader, new InputStreamReader(getClass().getResourceAsStream("BA-1234.xml"))).identical());
-        } finally {
-            fileReader.close();
-        }
-
-        fileReader = new FileReader(new File("target/flights/BA-5678.xml"));
-        try {
-            assertTrue(XMLUnit.compareXML(fileReader, new InputStreamReader(getClass().getResourceAsStream("BA-5678.xml"))).identical());
-        } finally {
-            fileReader.close();
-        }
+        assertTrue(XMLUnit.compareXML(StreamUtils.readStreamAsString(getClass().getResourceAsStream("BA-1234.xml"), "UTF-8"), new InputStreamReader(getClass().getResourceAsStream("BA-1234.xml"))).identical());
+        assertTrue(XMLUnit.compareXML(StreamUtils.readStreamAsString(getClass().getResourceAsStream("BA-5678.xml"), "UTF-8"), new InputStreamReader(getClass().getResourceAsStream("BA-5678.xml"))).identical());
     }
 }

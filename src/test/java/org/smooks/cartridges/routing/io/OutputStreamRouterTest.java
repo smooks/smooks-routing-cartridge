@@ -42,6 +42,8 @@
  */
 package org.smooks.cartridges.routing.io;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.smooks.api.Registry;
 import org.smooks.api.lifecycle.LifecycleManager;
 import org.smooks.api.resource.config.ResourceConfig;
@@ -50,10 +52,8 @@ import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
 import org.smooks.engine.lookup.LifecycleManagerLookup;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.tck.MockApplicationContext;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test for {@link OutputStreamRouter}
@@ -61,7 +61,6 @@ import static org.testng.AssertJUnit.assertEquals;
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>
  *
  */
-@Test(groups = "unit")
 public class OutputStreamRouterTest {
 	private String resourceName = "testResource";
 	private String beanId = "testBeanId";
@@ -78,7 +77,7 @@ public class OutputStreamRouterTest {
 		assertEquals(resourceName, router.getResourceName());
 	}
 
-	@BeforeTest
+	@Before
 	public void setup() {
 		config = createConfig(resourceName, beanId);
 	}

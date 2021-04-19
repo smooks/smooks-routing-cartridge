@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.routing.file;
 
+import org.junit.*;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.Registry;
@@ -62,9 +63,6 @@ import org.smooks.io.payload.StringSource;
 import org.smooks.support.FileUtils;
 import org.smooks.tck.MockApplicationContext;
 import org.smooks.tck.MockExecutionContext;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -77,14 +75,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static org.testng.AssertJUnit.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit test for {@link FileOutputStreamResource}
  * 
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>
  */
-@Test(groups = "unit")
 public class FileOutputStreamResourceTest {
     private final String resourceName = "testResourceName";
     private final String fileNamePattern = "testFileName";
@@ -94,7 +91,7 @@ public class FileOutputStreamResourceTest {
     private final File file2 = new File("target/config-01-test/2/2.xml");
     private final File file3 = new File("target/config-01-test/3/3.xml");
 
-    @BeforeClass
+    @Before
     public void setUp() throws Exception {
         Registry registry = new MockApplicationContext().getRegistry();
         LifecycleManager lifecycleManager = registry.lookup(new LifecycleManagerLookup());
@@ -223,7 +220,7 @@ public class FileOutputStreamResourceTest {
         return new String(FileUtils.readFile(file));
     }
 
-    @AfterClass
+    @After
     public void tearDown() throws Exception {
         deleteFiles();
     }

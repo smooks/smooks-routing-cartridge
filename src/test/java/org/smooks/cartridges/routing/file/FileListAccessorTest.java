@@ -42,14 +42,13 @@
  */
 package org.smooks.cartridges.routing.file;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.smooks.tck.MockExecutionContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import java.util.List;
 
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * 	Unit test for FileListAccessor
@@ -57,12 +56,11 @@ import static org.testng.AssertJUnit.assertTrue;
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>			
  *
  */
-@Test ( groups = "unit" )
 public class FileListAccessorTest
 {
-	private MockExecutionContext execContext;
+	private static MockExecutionContext execContext;
 
-	@Test ( expectedExceptions = IllegalArgumentException.class )
+	@Test ( expected = IllegalArgumentException.class )
 	public void setFileNameNegative()
 	{
 		FileListAccessor.addFileName( null, execContext );
@@ -82,7 +80,7 @@ public class FileListAccessorTest
 	}
 	
 	@BeforeClass
-	public void setup()
+	public static void setup()
 	{
 		execContext = new MockExecutionContext();
 	}
