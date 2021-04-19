@@ -42,14 +42,14 @@
  */
 package org.smooks.cartridges.routing.file.naming;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit test for TemplatedNamingStrategy
@@ -57,7 +57,6 @@ import static org.testng.AssertJUnit.assertNotNull;
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>			
  *
  */
-@Test ( groups = "unit" )
 public class TemplatedNamingStrategyTest
 {
 	@Test

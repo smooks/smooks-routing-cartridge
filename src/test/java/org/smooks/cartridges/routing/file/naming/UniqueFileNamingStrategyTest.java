@@ -42,9 +42,9 @@
  */
 package org.smooks.cartridges.routing.file.naming;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for class DefaultNamingStrategy
@@ -52,7 +52,6 @@ import static org.testng.AssertJUnit.assertTrue;
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>
  *
  */
-@Test ( groups = "unit" )
 public class UniqueFileNamingStrategyTest
 {
 	private String pattern = "prefix-";

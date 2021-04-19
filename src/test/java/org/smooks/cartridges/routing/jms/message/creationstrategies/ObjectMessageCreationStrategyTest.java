@@ -44,11 +44,11 @@ package org.smooks.cartridges.routing.jms.message.creationstrategies;
 
 import com.mockrunner.mock.jms.JMSMockObjectFactory;
 import com.mockrunner.mock.jms.MockConnectionFactory;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.smooks.cartridges.routing.jms.TestBean;
 import org.smooks.cartridges.routing.util.RouterTestHelper;
 import org.smooks.tck.MockExecutionContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
@@ -58,15 +58,14 @@ import javax.jms.Session;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
-import static org.testng.AssertJUnit.assertSame;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>
  *
  */
-@Test ( groups = "unit")
 public class ObjectMessageCreationStrategyTest
 {
 	private final ObjectMessageCreationStrategy strategy = new ObjectMessageCreationStrategy();

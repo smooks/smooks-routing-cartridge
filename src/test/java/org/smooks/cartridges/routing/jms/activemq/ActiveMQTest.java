@@ -42,6 +42,9 @@
  */
 package org.smooks.cartridges.routing.jms.activemq;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.routing.jms.JMSRouter;
@@ -51,9 +54,6 @@ import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
 import org.smooks.engine.DefaultApplicationContextBuilder;
 import org.smooks.engine.resource.visitor.smooks.NestedSmooksVisitor;
 import org.smooks.io.payload.StringSource;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
@@ -61,12 +61,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
-@Test ( groups = "unit" )
 public class ActiveMQTest {
 
     private static ActiveMQProvider mqProvider;

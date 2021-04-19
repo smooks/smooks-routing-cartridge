@@ -42,7 +42,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <smooks.version>2.0.0-M3</smooks.version>
     </properties>
 
     <build>
@@ -113,6 +112,7 @@
                                     <onlyWhenRelease>true</onlyWhenRelease>
                                     <message>No Snapshots Allowed!</message>
                                 </requireReleaseDeps>
+                                <dependencyConvergence/>
                             </rules>
                         </configuration>
                         <goals>
@@ -188,16 +188,26 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>commons-digester</groupId>
+                <artifactId>commons-digester</artifactId>
+                <version>1.8</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-templating-cartridge</artifactId>
-            <version>${smooks.version}</version>
+            <version>2.0.0-RC1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.smooks</groupId>
             <artifactId>smooks-tck</artifactId>
-            <version>${smooks.version}</version>
+            <version>2.0.0-RC1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -209,30 +219,21 @@
         <!-- Test dependencies -->
         <dependency>
             <groupId>com.mockrunner</groupId>
-            <artifactId>mockrunner-jdk1.5-j2ee1.3</artifactId>
-            <version>0.4</version>
+            <artifactId>mockrunner-all</artifactId>
+            <version>2.0.6</version>
             <scope>test</scope>
-            <!-- Mockrunner appears to have a screwed up POM. Excluding these un resolveable dependencies. -->
             <exclusions>
                 <exclusion>
-                    <groupId>cglib-nodep</groupId>
-                    <artifactId>cglib-nodep</artifactId>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>jboss</groupId>
-                    <artifactId>jboss-jee</artifactId>
+                    <groupId>com.mockrunner</groupId>
+                    <artifactId>mockrunner-tag</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
+                    <groupId>com.mockrunner</groupId>
+                    <artifactId>mockrunner-struts</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -247,12 +248,6 @@
             <artifactId>ejb-api</artifactId>
             <version>3.0</version>
         </dependency>
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.8.0.10</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- ActiveMQ for testing... -->
         <dependency>
@@ -260,12 +255,12 @@
             <artifactId>activemq-broker</artifactId>
             <version>5.16.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>10.15.2.0</version>
-            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>mx4j</groupId>
@@ -303,31 +298,7 @@
             <version>2.13.3</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.4.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>test-unit</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <testGroups>unit</testGroups>
-            </properties>
-        </profile>
-        <profile>
-            <id>test-integration</id>
-            <properties>
-                <testGroups>unit,integration</testGroups>
-            </properties>
-        </profile>
-    </profiles>
 
     <repositories>
         <repository>

@@ -42,10 +42,9 @@
  */
 package org.smooks.cartridges.routing.jms.message.creationstrategies;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.assertTrue;
-
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for StrategyFactory
@@ -53,7 +52,6 @@ import static org.testng.AssertJUnit.assertTrue;
  * @author <a href="mailto:daniel.bevenius@gmail.com">Daniel Bevenius</a>				
  *
  */
-@Test ( groups = "unit" )
 public class StrategyFactoryTest
 {
 	@Test
