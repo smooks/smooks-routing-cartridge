@@ -49,14 +49,10 @@
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd">
 
     <!--
-    Filter the message using the SAX Filter i.e. not DOM, so no
+    Filter the message using the SAX NG Filter i.e. not DOM, so no
     intermediate DOM for the "complete" message - there are "mini" DOMs
     for Flight the NodeModels below....
     -->
-    <params>
-        <param name="stream.filter.type">SAX</param>
-    </params>
-
     <resource-config selector="Flight">
         <resource>org.smooks.engine.resource.visitor.dom.DomModelCreator</resource>
     </resource-config>
