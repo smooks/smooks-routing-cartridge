@@ -53,6 +53,8 @@ import org.smooks.engine.lookup.LifecycleManagerLookup;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.tck.MockApplicationContext;
 
+import java.util.Properties;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -84,7 +86,7 @@ public class OutputStreamRouterTest {
 
 
 	private ResourceConfig createConfig(final String resourceName, final String beanId) {
-		ResourceConfig config = new DefaultResourceConfig("x", OutputStreamRouter.class.getName());
+		ResourceConfig config = new DefaultResourceConfig("x", new Properties(), OutputStreamRouter.class.getName());
 		config.setParameter("resourceName", resourceName);
 		config.setParameter("beanId", beanId);
 		return config;

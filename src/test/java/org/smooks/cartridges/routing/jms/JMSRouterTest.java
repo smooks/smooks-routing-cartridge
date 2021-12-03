@@ -70,6 +70,7 @@ import javax.jms.TextMessage;
 import javax.naming.Context;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 
@@ -96,7 +97,7 @@ public class JMSRouterTest {
 
     @Test(expected = SmooksConfigException.class)
     public void configureWithMissingDestinationType() {
-        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, new Properties(), JMSRouter.class.getName());
         JMSRouter jmsRouter = new JMSRouter();
         lifecycleManager.applyPhase(jmsRouter, new PostConstructLifecyclePhase(new Scope(registry, config, jmsRouter)));
     }
@@ -109,7 +110,7 @@ public class JMSRouterTest {
 
         final MockExecutionContext executionContext = RouterTestHelper.createExecutionContext(beanId, bean);
 
-        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, new Properties(), JMSRouter.class.getName());
         config.setParameter("destinationName", queueName);
         config.setParameter("beanId", beanId);
         final JMSRouter router = new JMSRouter();
@@ -133,7 +134,7 @@ public class JMSRouterTest {
 
         final MockExecutionContext executionContext = RouterTestHelper.createExecutionContext(beanId, bean);
 
-        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, new Properties(), JMSRouter.class.getName());
         config.setParameter("destinationName", queueName);
         config.setParameter("beanId", beanId);
         config.setParameter("highWaterMark", "3");
@@ -170,7 +171,7 @@ public class JMSRouterTest {
 
         final MockExecutionContext executionContext = RouterTestHelper.createExecutionContext(beanId, bean);
 
-        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, new Properties(), JMSRouter.class.getName());
         config.setParameter("destinationName", queueName);
         config.setParameter("beanId", beanId);
         config.setParameter("highWaterMark", "3");
@@ -195,7 +196,7 @@ public class JMSRouterTest {
     @Test
     public void setJndiContextFactory() {
         final String contextFactory = MockContextFactory.class.getName();
-        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, new Properties(), JMSRouter.class.getName());
         setManadatoryProperties(config);
         config.setParameter("jndiContextFactory", contextFactory);
         final JMSRouter router = new JMSRouter();
@@ -208,7 +209,7 @@ public class JMSRouterTest {
     @Test
     public void setJndiProviderUrl() {
         final String providerUrl = "jnp://localhost:1099";
-        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, new Properties(), JMSRouter.class.getName());
         setManadatoryProperties(config);
         config.setParameter("jndiProviderUrl", providerUrl);
         final JMSRouter router = new JMSRouter();
@@ -222,7 +223,7 @@ public class JMSRouterTest {
     public void setJndiNamingFactoryUrl() {
         final String namingFactoryUrlPkgs = "org.jboss.naming:org.jnp.interfaces";
 
-        ResourceConfig config = new DefaultResourceConfig(selector, JMSRouter.class.getName());
+        ResourceConfig config = new DefaultResourceConfig(selector, new Properties(), JMSRouter.class.getName());
         setManadatoryProperties(config);
         config.setParameter("jndiNamingFactoryUrl", namingFactoryUrlPkgs);
         final JMSRouter router = new JMSRouter();

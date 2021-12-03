@@ -74,6 +74,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 
@@ -167,8 +168,9 @@ public class FileOutputStreamResourceTest {
             nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.OUTPUT_TO));
             nestedSmooksVisitor.setOutputStreamResourceOptional(Optional.of("fileOS"));
             nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
-            
-            smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
+
+            Bean bean = new Bean(HashMap.class, "object", smooks.getApplicationContext().getRegistry());
+            smooks.addVisitors(bean.bindTo("a", "a"));
             smooks.addVisitor(nestedSmooksVisitor, "a");
             smooks.addVisitor(new FileOutputStreamResource().setFileNamePattern("${object.a}.xml").setDestinationDirectoryPattern("target/config-01-test/${object.a}").setResourceName("fileOS"), "a");
 
@@ -198,8 +200,9 @@ public class FileOutputStreamResourceTest {
             nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.OUTPUT_TO));
             nestedSmooksVisitor.setOutputStreamResourceOptional(Optional.of(outputStreamRef));
             nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
-            
-            smooks.addVisitors(new Bean(HashMap.class, "object").bindTo("a", "a"));
+
+            Bean bean = new Bean(HashMap.class, "object", smooks.getApplicationContext().getRegistry());
+            smooks.addVisitors(bean.bindTo("a", "a"));
             smooks.addVisitor(nestedSmooksVisitor, "a");
             smooks.addVisitor(new FileOutputStreamResource()
                             .setAppend(true)
@@ -236,7 +239,7 @@ public class FileOutputStreamResourceTest {
             final String fileName,
             final String destinationDirectory,
             final String listFileName) {
-        ResourceConfig config = new DefaultResourceConfig("x", FileOutputStreamResource.class.getName());
+        ResourceConfig config = new DefaultResourceConfig("x", new Properties(), FileOutputStreamResource.class.getName());
         config.setParameter("resourceName", resourceName);
         config.setParameter("fileNamePattern", fileName);
         config.setParameter("destinationDirectoryPattern", destinationDirectory);
