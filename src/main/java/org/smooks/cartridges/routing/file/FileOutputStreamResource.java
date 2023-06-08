@@ -57,7 +57,7 @@ import org.smooks.support.DollarBraceDecoder;
 import org.smooks.support.FreeMarkerTemplate;
 import org.smooks.support.FreeMarkerUtils;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.*;
 import java.util.Map;

@@ -58,7 +58,7 @@ import org.smooks.io.AbstractOutputStreamResource;
 import org.smooks.io.ResourceOutputStream;
 import org.w3c.dom.Element;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
