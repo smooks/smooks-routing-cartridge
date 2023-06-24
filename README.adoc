@@ -235,6 +235,10 @@ The following is an example `+<jms:router>+` configuration that routes an `+orde
 In this case, we route the result of a FreeMarker templating operation to the JMS Queue (i.e. as a String). We could also have routed a full Object Model, in which case it would be routed as a Serialized ObjectMessage.
 // end::smooks-routing-cartridge[]
 
+== Requirements
+
+* Java 11 or higher
+
 == Maven Coordinates
 
 .pom.xml
