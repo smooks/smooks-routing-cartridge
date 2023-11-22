@@ -63,7 +63,6 @@ import org.smooks.engine.delivery.fragment.NodeFragment;
 import org.smooks.engine.delivery.sax.ng.CharDataFragmentEvent;
 import org.smooks.engine.xml.NamespaceManager;
 import org.smooks.namespace.NamespaceDeclarationStack;
-import org.smooks.support.CollectionsUtil;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 
@@ -75,6 +74,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Basic message fragment serializer.
@@ -141,7 +142,7 @@ public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer
     }
 
     public Set<? extends Object> getProducts() {
-		return CollectionsUtil.toSet(bindTo);
+		return Stream.of(bindTo).collect(Collectors.toSet());
 	}
 
 	@Override
