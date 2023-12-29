@@ -4,6 +4,10 @@ image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-routin
 image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-routing-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
 image:https://github.com/smooks/smooks-routing-cartridge/workflows/CI/badge.svg[Build Status]
 
+== Requirements
+
+* Java 11 or higher
+
 // tag::smooks-routing-cartridge[]
 A common approach to processing large/huge messages is to split them out into smaller messages that can be processed independently. Of course splitting and routing is not just a solution for processing huge
 messages. It's often needed with smaller messages as well (message size may be irrelevant) where, for example, order items in an order message need to be split out and routed (based on content - "Content Base Routing") to different departments or partners for processing. Under these conditions, the message formats required at the different destinations may also vary e.g.,
@@ -234,10 +238,6 @@ The following is an example `+<jms:router>+` configuration that routes an `+orde
 
 In this case, we route the result of a FreeMarker templating operation to the JMS Queue (i.e. as a String). We could also have routed a full Object Model, in which case it would be routed as a Serialized ObjectMessage.
 // end::smooks-routing-cartridge[]
-
-== Requirements
-
-* Java 11 or higher
 
 == Maven Coordinates
 
