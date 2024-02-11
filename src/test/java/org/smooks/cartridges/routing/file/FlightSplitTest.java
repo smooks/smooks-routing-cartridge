@@ -80,7 +80,7 @@ public class FlightSplitTest {
 
         XMLUnit.setIgnoreWhitespace(true);
 
-        assertTrue(XMLUnit.compareXML(StreamUtils.readStreamAsString(getClass().getResourceAsStream("BA-1234.xml"), "UTF-8"), new InputStreamReader(getClass().getResourceAsStream("BA-1234.xml"))).identical());
-        assertTrue(XMLUnit.compareXML(StreamUtils.readStreamAsString(getClass().getResourceAsStream("BA-5678.xml"), "UTF-8"), new InputStreamReader(getClass().getResourceAsStream("BA-5678.xml"))).identical());
+        assertTrue(XMLUnit.compareXML(new FileReader("target/flights/BA-1234.xml"), new InputStreamReader(getClass().getResourceAsStream("BA-1234.xml"))).identical());
+        assertTrue(XMLUnit.compareXML(new FileReader("target/flights/BA-5678.xml"), new InputStreamReader(getClass().getResourceAsStream("BA-5678.xml"))).identical());
     }
 }

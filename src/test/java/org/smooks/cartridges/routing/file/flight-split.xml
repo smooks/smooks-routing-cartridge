@@ -48,17 +48,8 @@
                       xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:jb="https://www.smooks.org/xsd/smooks/javabean-1.6.xsd">
 
-    <!--
-    Filter the message using the SAX NG Filter i.e. not DOM, so no
-    intermediate DOM for the "complete" message - there are "mini" DOMs
-    for Flight the NodeModels below....
-    -->
-    <resource-config selector="Flight">
-        <resource>org.smooks.engine.resource.visitor.dom.DomModelCreator</resource>
-    </resource-config>
-
-    <!-- Apply a template to each "Flight" NodeModel (captured above), outputting to the file stream (below) -->
-    <core:smooks filterSourceOn="Flight">
+    <!-- Apply a template to each "Flight" node, outputting to the file stream -->
+    <core:smooks filterSourceOn="Flight" maxNodeDepth="0">
         <core:action>
             <core:outputTo outputStreamResource="flightSplitStream"/>
         </core:action>
