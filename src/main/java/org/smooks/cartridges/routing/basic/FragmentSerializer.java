@@ -84,7 +84,7 @@ import java.util.stream.Stream;
  */
 public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer, VisitLifecycleCleanable {
 
-	private static final TypedKey<Map<String, FragmentSerializerVisitor>> FRAGMENT_SERIALIZER_TYPED_KEY = new TypedKey<>();
+	private static final TypedKey<Map<String, FragmentSerializerVisitor>> FRAGMENT_SERIALIZER_TYPED_KEY = TypedKey.of();
     private String bindTo;
     private boolean omitXMLDeclaration;
 	private boolean childContentOnly;
