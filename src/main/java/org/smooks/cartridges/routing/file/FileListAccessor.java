@@ -66,7 +66,7 @@ public class FileListAccessor
     /*
 	 * 	Keys for the entry containing the file lists (used in ExecutionContexts attribute map )
      */
-    private static final TypedKey<List<String>> ALL_LIST_FILE_NAME_CONTEXT_KEY = new TypedKey<>();
+    private static final TypedKey<List<String>> ALL_LIST_FILE_NAME_CONTEXT_KEY = TypedKey.of();
     
 	private FileListAccessor() { }
 	
