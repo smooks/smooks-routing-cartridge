@@ -115,7 +115,7 @@ public class FileOutputStreamResourceTest {
         OutputStream outputStream = new ResourceOutputStream(executionContext, resource.getResourceName()).getDelegateOutputStream();
         assertTrue(outputStream instanceof FileOutputStream);
 
-        resource.executeVisitLifecycleCleanup(new NodeFragment(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()), executionContext);
+        resource.onPostFragment(new NodeFragment(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()), executionContext);
 
         assertThatFilesWereGenerated(executionContext);
     }
@@ -161,7 +161,7 @@ public class FileOutputStreamResourceTest {
         Smooks smooks = new Smooks();
 
         try {
-            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().setRegisterSystemResources(false).build());
+            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().withSystemResources(false).build());
             nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
 
             NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
@@ -193,7 +193,7 @@ public class FileOutputStreamResourceTest {
         final File outputFile = new File(destinationDir, outputFileName);
         
         try {
-            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().setRegisterSystemResources(false).build());
+            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().withSystemResources(false).build());
             nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
 
             NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();

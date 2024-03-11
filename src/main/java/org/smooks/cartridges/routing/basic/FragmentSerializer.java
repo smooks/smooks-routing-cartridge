@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -52,15 +52,15 @@ import org.smooks.api.delivery.event.ExecutionEvent;
 import org.smooks.api.delivery.event.ExecutionEventListener;
 import org.smooks.api.delivery.fragment.Fragment;
 import org.smooks.api.delivery.ordering.Producer;
-import org.smooks.api.lifecycle.VisitLifecycleCleanable;
+import org.smooks.api.lifecycle.PostFragmentLifecycle;
 import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
 import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.engine.bean.lifecycle.DefaultBeanContextLifecycleEvent;
 import org.smooks.engine.delivery.dom.serialize.DefaultDOMSerializerVisitor;
-import org.smooks.engine.delivery.event.EndFragmentEvent;
-import org.smooks.engine.delivery.event.StartFragmentEvent;
+import org.smooks.engine.delivery.event.EndFragmentExecutionEvent;
+import org.smooks.engine.delivery.event.StartFragmentExecutionEvent;
 import org.smooks.engine.delivery.fragment.NodeFragment;
-import org.smooks.engine.delivery.sax.ng.CharDataFragmentEvent;
+import org.smooks.engine.delivery.sax.ng.CharDataFragmentExecutionEvent;
 import org.smooks.engine.xml.NamespaceManager;
 import org.smooks.namespace.NamespaceDeclarationStack;
 import org.w3c.dom.CharacterData;
@@ -79,62 +79,64 @@ import java.util.stream.Stream;
 
 /**
  * Basic message fragment serializer.
- * 
+ *
  * @author <a href="mailto:tom.fennelly@jboss.com">tom.fennelly@jboss.com</a>
  */
-public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer, VisitLifecycleCleanable {
+public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer, PostFragmentLifecycle {
 
-	private static final TypedKey<Map<String, FragmentSerializerVisitor>> FRAGMENT_SERIALIZER_TYPED_KEY = TypedKey.of();
+    private static final TypedKey<Map<String, FragmentSerializerVisitor>> FRAGMENT_SERIALIZER_TYPED_KEY = TypedKey.of();
     private String bindTo;
     private boolean omitXMLDeclaration;
-	private boolean childContentOnly;
+    private boolean childContentOnly;
     private boolean retain;
-    
+
     /**
      * Set the bind-to beanId for the serialized fragment.
-	 * @param bindTo The bind-to beanId for the serialized fragment.
-	 * @return this instance.
-	 */
+     *
+     * @param bindTo The bind-to beanId for the serialized fragment.
+     * @return this instance.
+     */
     @Inject
-	public FragmentSerializer setBindTo(String bindTo) {
-		this.bindTo = bindTo;
-		return this;
-	}
-    
+    public FragmentSerializer setBindTo(String bindTo) {
+        this.bindTo = bindTo;
+        return this;
+    }
+
     /**
      * Omit the XML Declaration from the serialized fragments.
-	 * @param omitXMLDeclaration True if the XML declaration is to be omitted, otherwise false.
-	 * @return this instance.
-	 */
+     *
+     * @param omitXMLDeclaration True if the XML declaration is to be omitted, otherwise false.
+     * @return this instance.
+     */
     @Inject
-	public FragmentSerializer setOmitXMLDeclaration(Optional<Boolean> omitXMLDeclaration) {
-		this.omitXMLDeclaration = omitXMLDeclaration.orElse(false);
-		return this;
-	}
+    public FragmentSerializer setOmitXMLDeclaration(Optional<Boolean> omitXMLDeclaration) {
+        this.omitXMLDeclaration = omitXMLDeclaration.orElse(false);
+        return this;
+    }
 
     /**
      * Set whether or not the child content only should be serialized.
      * <p/>
      * This variable is, by default, false.
-     * 
-	 * @param childContentOnly True if the child content only (exclude 
-	 * the targeted element itself), otherwise false.
-	 * @return this instance.
-	 */
+     *
+     * @param childContentOnly True if the child content only (exclude
+     *                         the targeted element itself), otherwise false.
+     * @return this instance.
+     */
     @Inject
-	public FragmentSerializer setChildContentOnly(Optional<Boolean> childContentOnly) {
-		this.childContentOnly = childContentOnly.orElse(false);
-		return this;
-	}
+    public FragmentSerializer setChildContentOnly(Optional<Boolean> childContentOnly) {
+        this.childContentOnly = childContentOnly.orElse(false);
+        return this;
+    }
 
     /**
      * Retain the fragment bean in the {@link BeanContext} after it's creating fragment
      * has been processed.
      *
-	 * @param retain True if the fragment bean is to be retained in the {@link org.smooks.api.bean.context.BeanContext},
-     * otherwise false.
-	 * @return this instance.
-	 */
+     * @param retain True if the fragment bean is to be retained in the {@link org.smooks.api.bean.context.BeanContext},
+     *               otherwise false.
+     * @return this instance.
+     */
     @Inject
     public FragmentSerializer setRetain(Optional<Boolean> retain) {
         this.retain = retain.orElse(false);
@@ -142,41 +144,41 @@ public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer
     }
 
     public Set<? extends Object> getProducts() {
-		return Stream.of(bindTo).collect(Collectors.toSet());
-	}
+        return Stream.of(bindTo).collect(Collectors.toSet());
+    }
 
-	@Override
-	public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-    	Map<String, FragmentSerializerVisitor> fragmentSerializers = executionContext.get(FRAGMENT_SERIALIZER_TYPED_KEY);
-    	
-    	if(fragmentSerializers == null) {
-    		fragmentSerializers = new HashMap<>();
-        	executionContext.put(FRAGMENT_SERIALIZER_TYPED_KEY, fragmentSerializers);
-    	}
+    @Override
+    public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
+        Map<String, FragmentSerializerVisitor> fragmentSerializers = executionContext.get(FRAGMENT_SERIALIZER_TYPED_KEY);
 
-		FragmentSerializerVisitor serializer = new FragmentSerializerVisitor(executionContext);
-    	fragmentSerializers.put(bindTo, serializer);
-    	
-        if(!omitXMLDeclaration) {
-        	serializer.fragmentWriter.write("<?xml version=\"1.0\"?>\n");
+        if (fragmentSerializers == null) {
+            fragmentSerializers = new HashMap<>();
+            executionContext.put(FRAGMENT_SERIALIZER_TYPED_KEY, fragmentSerializers);
         }
-    	
-    	// Now add a dynamic visitor...
-		executionContext.getContentDeliveryRuntime().addExecutionEventListener(serializer);
+
+        FragmentSerializerVisitor serializer = new FragmentSerializerVisitor(executionContext);
+        fragmentSerializers.put(bindTo, serializer);
+
+        if (!omitXMLDeclaration) {
+            serializer.fragmentWriter.write("<?xml version=\"1.0\"?>\n");
+        }
+
+        // Now add a dynamic visitor...
+        executionContext.getContentDeliveryRuntime().addExecutionEventListener(serializer);
 
         notifyStartBean(new NodeFragment(element), executionContext);
     }
 
-	@Override
-	public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-    	Map<String, FragmentSerializerVisitor> fragmentSerializers = executionContext.get(FRAGMENT_SERIALIZER_TYPED_KEY);
-		FragmentSerializerVisitor serializer = fragmentSerializers.get(bindTo);
+    @Override
+    public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
+        Map<String, FragmentSerializerVisitor> fragmentSerializers = executionContext.get(FRAGMENT_SERIALIZER_TYPED_KEY);
+        FragmentSerializerVisitor serializer = fragmentSerializers.get(bindTo);
 
-    	try {
-    		executionContext.getBeanContext().addBean(bindTo, serializer.fragmentWriter.toString().trim(), new NodeFragment(element));
-    	} finally {
-			executionContext.getContentDeliveryRuntime().removeExecutionEventListener(serializer);
-    	}
+        try {
+            executionContext.getBeanContext().addBean(bindTo, serializer.fragmentWriter.toString().trim(), new NodeFragment(element));
+        } finally {
+            executionContext.getContentDeliveryRuntime().removeExecutionEventListener(serializer);
+        }
     }
 
     private void notifyStartBean(NodeFragment source, ExecutionContext executionContext) {
@@ -187,133 +189,133 @@ public class FragmentSerializer implements BeforeVisitor, AfterVisitor, Producer
     }
 
     @Override
-    public void executeVisitLifecycleCleanup(Fragment fragment, ExecutionContext executionContext) {
+    public void onPostFragment(Fragment fragment, ExecutionContext executionContext) {
         BeanContext beanContext = executionContext.getBeanContext();
         BeanId beanId = beanContext.getBeanId(bindTo);
         Object bean = beanContext.getBean(beanId);
 
         beanContext.notifyObservers(new DefaultBeanContextLifecycleEvent(executionContext, fragment, BeanLifecycle.END_FRAGMENT, beanId, bean));
-        if(!retain) {
+        if (!retain) {
             executionContext.getBeanContext().removeBean(beanId, null);
         }
     }
 
-	private class FragmentSerializerVisitor implements ExecutionEventListener {
+    private class FragmentSerializerVisitor implements ExecutionEventListener {
 
-		private final ExecutionContext executionContext;
-		private final StringWriter fragmentWriter = new StringWriter();
-		private final DefaultDOMSerializerVisitor serializerVisitor;
-		private int depth = 0;
-    	
-		public FragmentSerializerVisitor(ExecutionContext executionContext) {
-			this.executionContext = executionContext;
-			serializerVisitor = new DefaultDOMSerializerVisitor();
-			serializerVisitor.postConstruct();
-		}
-		
-		public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-			Element copyElement = (Element) element.cloneNode(false);
-			if (depth == 0) {
+        private final ExecutionContext executionContext;
+        private final StringWriter fragmentWriter = new StringWriter();
+        private final DefaultDOMSerializerVisitor serializerVisitor;
+        private int depth = 0;
+
+        public FragmentSerializerVisitor(ExecutionContext executionContext) {
+            this.executionContext = executionContext;
+            serializerVisitor = new DefaultDOMSerializerVisitor();
+            serializerVisitor.postConstruct();
+        }
+
+        public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
+            Element copyElement = (Element) element.cloneNode(false);
+            if (depth == 0) {
                 addRootNamespaces(copyElement, executionContext);
             }
 
-	        if(childContentOnly) {
-	        	// Print child content only, so only print the start if the depth is greater
-	        	// than 1...
-	        	if(depth > 0) {
-					try {
-						serializerVisitor.writeStartElement(copyElement, fragmentWriter, null);
-					} catch (IOException e) {
-						throw new SmooksException(e.getMessage(), e);
-					}
-	        	}
-	        } else {
-				try {
-					// Printing all of the element, so just print the start element...
-					serializerVisitor.writeStartElement(copyElement, fragmentWriter, null);
-				} catch (IOException e) {
-					throw new SmooksException(e.getMessage(), e);
-				}
-	        }
-	        depth++;
-		}
-		
-		public void visitChildText(CharacterData characterData, ExecutionContext executionContext) throws SmooksException {
-			try {
-				serializerVisitor.writeCharacterData(characterData, fragmentWriter, executionContext);
-			} catch (IOException e) {
-				throw new SmooksException(e.getMessage(), e);
-			}
-		}
+            if (childContentOnly) {
+                // Print child content only, so only print the start if the depth is greater
+                // than 1...
+                if (depth > 0) {
+                    try {
+                        serializerVisitor.writeStartElement(copyElement, fragmentWriter, null);
+                    } catch (IOException e) {
+                        throw new SmooksException(e.getMessage(), e);
+                    }
+                }
+            } else {
+                try {
+                    // Printing all of the element, so just print the start element...
+                    serializerVisitor.writeStartElement(copyElement, fragmentWriter, null);
+                } catch (IOException e) {
+                    throw new SmooksException(e.getMessage(), e);
+                }
+            }
+            depth++;
+        }
 
-		public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-	        depth--;
-	        if(childContentOnly) {
-	        	// Print child content only, so only print the empty element if the depth is greater
-	        	// than 1...
-	        	if(depth > 0) {
-					try {
-						serializerVisitor.writeEndElement(element, fragmentWriter, null);
-					} catch (IOException e) {
-						throw new SmooksException(e.getMessage(), e);
-					}
-				}
-	        } else {
-	        	// Printing all of the elements, so just print the end of the element...
-				try {
-					serializerVisitor.writeEndElement(element, fragmentWriter, null);
-				} catch (IOException e) {
-					throw new SmooksException(e.getMessage(), e);
-				}
-	        }
-		}		
+        public void visitChildText(CharacterData characterData, ExecutionContext executionContext) throws SmooksException {
+            try {
+                serializerVisitor.writeCharacterData(characterData, fragmentWriter, executionContext);
+            } catch (IOException e) {
+                throw new SmooksException(e.getMessage(), e);
+            }
+        }
+
+        public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
+            depth--;
+            if (childContentOnly) {
+                // Print child content only, so only print the empty element if the depth is greater
+                // than 1...
+                if (depth > 0) {
+                    try {
+                        serializerVisitor.writeEndElement(element, fragmentWriter, null);
+                    } catch (IOException e) {
+                        throw new SmooksException(e.getMessage(), e);
+                    }
+                }
+            } else {
+                // Printing all of the elements, so just print the end of the element...
+                try {
+                    serializerVisitor.writeEndElement(element, fragmentWriter, null);
+                } catch (IOException e) {
+                    throw new SmooksException(e.getMessage(), e);
+                }
+            }
+        }
 
         private void addRootNamespaces(Element element, ExecutionContext executionContext) {
             NamespaceDeclarationStack nsDeclStack = executionContext.get(NamespaceManager.NAMESPACE_DECLARATION_STACK_TYPED_KEY);
             Map<String, String> rootNamespaces = nsDeclStack.getActiveNamespaces();
 
             if (!rootNamespaces.isEmpty()) {
-                Set<Map.Entry<String,String>> namespaces = rootNamespaces.entrySet();
-                for (Map.Entry<String,String> namespace : namespaces) {
+                Set<Map.Entry<String, String>> namespaces = rootNamespaces.entrySet();
+                for (Map.Entry<String, String> namespace : namespaces) {
                     addNamespace(namespace.getKey(), namespace.getValue(), element);
                 }
             }
         }
 
-		private void addNamespace(String prefix, String namespaceURI, Element element) {
+        private void addNamespace(String prefix, String namespaceURI, Element element) {
             if (prefix == null || namespaceURI == null) {
                 // No namespace.  Ignore...
                 return;
-            } else  if(prefix.equals(XMLConstants.DEFAULT_NS_PREFIX) && namespaceURI.equals(XMLConstants.NULL_NS_URI)) {
+            } else if (prefix.equals(XMLConstants.DEFAULT_NS_PREFIX) && namespaceURI.equals(XMLConstants.NULL_NS_URI)) {
                 // No namespace.  Ignore...
                 return;
-			} else {
-				String prefixNS = element.getAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix);
-				if(prefixNS != null && prefixNS.length() != 0) {
-					// Already declared (on the element)...
-					return;
-				}
-			}
+            } else {
+                String prefixNS = element.getAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, prefix);
+                if (prefixNS != null && !prefixNS.isEmpty()) {
+                    // Already declared (on the element)...
+                    return;
+                }
+            }
 
-			if(prefix.length() > 0) {
-				element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix, namespaceURI);
-			} else {
-				element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns", namespaceURI);
-			}
-		}
+            if (!prefix.isEmpty()) {
+                element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix, namespaceURI);
+            } else {
+                element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns", namespaceURI);
+            }
+        }
 
-		@Override
-		public void onEvent(ExecutionEvent executionEvent) {
-			if (executionEvent instanceof StartFragmentEvent) {
-				StartFragmentEvent startFragmentEvent = (StartFragmentEvent) executionEvent;
-				visitBefore((Element) startFragmentEvent.getFragment().unwrap(), executionContext);
-			} else if (executionEvent instanceof CharDataFragmentEvent) {
-				CharDataFragmentEvent charDataFragmentEvent = (CharDataFragmentEvent) executionEvent;
-				visitChildText((CharacterData) charDataFragmentEvent.getFragment().unwrap(), executionContext);
-			} else if (executionEvent instanceof EndFragmentEvent) {
-				EndFragmentEvent endFragmentEvent = (EndFragmentEvent) executionEvent;
-				visitAfter((Element) endFragmentEvent.getFragment().unwrap(), executionContext);
-			}
-		}
-	}
+        @Override
+        public void onEvent(ExecutionEvent executionEvent) {
+            if (executionEvent instanceof StartFragmentExecutionEvent) {
+                StartFragmentExecutionEvent<?> startFragmentEvent = (StartFragmentExecutionEvent<?>) executionEvent;
+                visitBefore((Element) startFragmentEvent.getFragment().unwrap(), executionContext);
+            } else if (executionEvent instanceof CharDataFragmentExecutionEvent) {
+                CharDataFragmentExecutionEvent charDataFragmentEvent = (CharDataFragmentExecutionEvent) executionEvent;
+                visitChildText((CharacterData) charDataFragmentEvent.getFragment().unwrap(), executionContext);
+            } else if (executionEvent instanceof EndFragmentExecutionEvent) {
+                EndFragmentExecutionEvent<?> endFragmentEvent = (EndFragmentExecutionEvent<?>) executionEvent;
+                visitAfter((Element) endFragmentEvent.getFragment().unwrap(), executionContext);
+            }
+        }
+    }
 }

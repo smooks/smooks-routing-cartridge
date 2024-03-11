@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -111,7 +111,7 @@ public class ActiveMQProvider {
         assertStarted();
 
         if (brokerService != null) {
-            for(MessageConsumer consumer : consumers) {
+            for (MessageConsumer consumer : consumers) {
                 try {
                     consumer.close();
                 } catch (Exception e) {
@@ -138,13 +138,13 @@ public class ActiveMQProvider {
     }
 
     private void assertNotStarted() {
-        if(brokerService != null) {
+        if (brokerService != null) {
             throw new IllegalStateException("Invalid method call after provider has been started.");
         }
     }
 
     private void assertStarted() {
-        if(brokerService == null) {
+        if (brokerService == null) {
             throw new IllegalStateException("Invalid method call before provider has been started.");
         }
     }
@@ -182,12 +182,10 @@ public class ActiveMQProvider {
 
             // Start the connection...
             queueConnection.start();
-        }
-        catch (JMSException e) {
+        } catch (JMSException e) {
             close(queueConnection, queueSession);
             throw e;
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             close(queueConnection, queueSession);
             throw (JMSException) (new JMSException("Unexpected exception while creating JMS Session.").initCause(t));
         }
@@ -202,12 +200,10 @@ public class ActiveMQProvider {
 
             // Start the connection...
             topicConnection.start();
-        }
-        catch (JMSException e) {
+        } catch (JMSException e) {
             close(topicConnection, topicSession);
             throw e;
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             close(topicConnection, topicSession);
             throw (JMSException) (new JMSException("Unexpected exception while creating JMS Session.").initCause(t));
         }
@@ -217,27 +213,19 @@ public class ActiveMQProvider {
         String connectionFactoryRuntime = jndiProperties.getProperty(ConnectionFactory.class.getName(), "ConnectionFactory");
         try {
             return (ConnectionFactory) JNDIUtil.lookup(connectionFactoryRuntime, jndiProperties);
-        }
-        catch (NamingException e) {
+        } catch (NamingException e) {
             throw (JMSException) (new JMSException("JNDI lookup of JMS Connection Factory [" + connectionFactoryRuntime + "] failed.").initCause(e));
-        }
-        catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw (JMSException) (new JMSException("JNDI lookup of JMS Connection Factory failed.  Class [" + connectionFactoryRuntime + "] is not an instance of [" + ConnectionFactory.class.getName() + "].").initCause(e));
         }
     }
 
-    private final Destination lookupDestination(String destinationName) throws JMSException
-    {
-        try
-        {
+    private final Destination lookupDestination(String destinationName) throws JMSException {
+        try {
             return (Destination) JNDIUtil.lookup(destinationName, jndiProperties);
-        }
-        catch (NamingException e)
-        {
+        } catch (NamingException e) {
             throw (JMSException) (new JMSException("JMS Destination lookup failed.  Destination name '" + destinationName + "'.").initCause(e));
-        }
-        catch (ClassCastException e)
-        {
+        } catch (ClassCastException e) {
             throw (JMSException) (new JMSException("JMS Destination lookup failed.  Class [" + destinationName + "] is not an instance of [" + Destination.class.getName() + "].").initCause(e));
         }
     }
@@ -248,8 +236,7 @@ public class ActiveMQProvider {
                 conn.stop();
                 LOGGER.debug("Stopping JMS Connection for connected session.");
             }
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             LOGGER.debug("Failed to stop JMS connection.", e);
             conn = null;
         }
@@ -258,11 +245,9 @@ public class ActiveMQProvider {
                 session.close();
                 LOGGER.debug("Closing JMS Session.");
             }
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             LOGGER.debug("Failed to close JMS session.", e);
-        }
-        finally {
+        } finally {
             session = null;
         }
         try {
@@ -270,11 +255,9 @@ public class ActiveMQProvider {
                 conn.close();
                 LOGGER.debug("Closing JMS Connection for connected session.");
             }
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             LOGGER.debug("Failed to close JMS connection.", e);
-        }
-        finally {
+        } finally {
             conn = null;
         }
     }

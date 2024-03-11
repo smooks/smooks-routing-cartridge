@@ -50,33 +50,33 @@
     -->
 
     <resource-config selector="fragment:serialize">
-        <resource>org.smooks.engine.resource.extension.NewResourceConfig</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.NewResourceConfig</resource>
         <param name="resource">org.smooks.cartridges.routing.basic.FragmentSerializer</param>
     </resource-config>
 
 	<resource-config selector="fragment:serialize">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">fragment</param>
         <param name="mapTo">selector</param>
     </resource-config>
     
     <resource-config selector="fragment:serialize">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">bindTo</param>
     </resource-config>
 
 	<resource-config selector="fragment:serialize">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">omitXMLDeclaration</param>
     </resource-config>
 
    	<resource-config selector="fragment:serialize">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">childContentOnly</param>
     </resource-config>
 
     <resource-config selector="fragment:serialize">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">retain</param>
         <param name="defaultValue">false</param>
     </resource-config>

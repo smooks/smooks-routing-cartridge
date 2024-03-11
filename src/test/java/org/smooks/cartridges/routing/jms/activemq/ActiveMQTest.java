@@ -99,7 +99,7 @@ public class ActiveMQTest {
     }
 
     private void configure(Smooks smooks) {
-        Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().setRegisterSystemResources(false).build());
+        Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().withSystemResources(false).build());
         nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
 
         NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
