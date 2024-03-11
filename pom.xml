@@ -8,7 +8,6 @@
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-routing-cartridge</artifactId>
     <version>2.0.0-SNAPSHOT</version>
-    <packaging>bundle</packaging>
 
     <name>Smooks Routing Cartridge</name>
     <url>https://www.smooks.org</url>
@@ -94,13 +93,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>5.1.9</version>
-                <extensions>true</extensions>
-                <inherited>true</inherited>
-            </plugin>                 
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>3.4.1</version>
@@ -113,6 +105,9 @@
                                     <onlyWhenRelease>true</onlyWhenRelease>
                                     <message>No Snapshots Allowed!</message>
                                 </requireReleaseDeps>
+                                <requireJavaVersion>
+                                    <version>11</version>
+                                </requireJavaVersion>
                                 <dependencyConvergence/>
                             </rules>
                         </configuration>
@@ -137,6 +132,9 @@
                 <version>3.2.5</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
+                    <argLine>
+                        --add-opens=java.base/java.lang=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
             <plugin>

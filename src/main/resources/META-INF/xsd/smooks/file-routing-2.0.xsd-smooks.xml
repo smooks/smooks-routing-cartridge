@@ -50,67 +50,67 @@
     -->
 
     <resource-config selector="file:outputStream">
-        <resource>org.smooks.engine.resource.extension.NewResourceConfig</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.NewResourceConfig</resource>
         <param name="resource">org.smooks.cartridges.routing.file.FileOutputStreamResource</param>
     </resource-config>
 
     <resource-config selector="file:outputStream">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">openOnElement</param>
         <param name="mapTo">selector</param>
     </resource-config>
     
     <resource-config selector="file:outputStream">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">resourceName</param>
     </resource-config>
 
     <resource-config selector="file:outputStream">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">encoding</param>
         <param name="mapTo">writerEncoding</param>
     </resource-config>
 
 	<resource-config selector="file:outputStream/fileNamePattern">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromText</resource>
         <param name="mapTo">fileNamePattern</param>
     </resource-config>
 
     <resource-config selector="file:outputStream/destinationDirectoryPattern">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromText</resource>
         <param name="mapTo">destinationDirectoryPattern</param>
     </resource-config>
 
     <resource-config selector="file:outputStream/listFileNamePattern">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromText</resource>
         <param name="mapTo">listFileNamePattern</param>
     </resource-config>
 
     <resource-config selector="file:outputStream/highWaterMark">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">mark</param>
         <param name="mapTo">highWaterMark</param>
     </resource-config>
 
     <resource-config selector="file:outputStream/highWaterMark">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">timeout</param>
         <param name="mapTo">highWaterMarkTimeout</param>
     </resource-config>
 
     <resource-config selector="file:outputStream/highWaterMark">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">pollFrequency</param>
         <param name="mapTo">highWaterMarkPollFrequency</param>
     </resource-config>
 
     <resource-config selector="file:outputStream/closeOnCondition">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromText</resource>
         <param name="mapTo">closeOnCondition</param>
     </resource-config>
     
     <resource-config selector="file:outputStream/append">
-        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromText</resource>
+        <resource>org.smooks.engine.resource.config.loader.xml.extension.MapToResourceConfigFromText</resource>
         <param name="mapTo">append</param>
     </resource-config>
 

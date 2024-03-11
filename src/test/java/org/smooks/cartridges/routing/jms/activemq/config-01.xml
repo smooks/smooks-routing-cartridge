@@ -47,9 +47,9 @@
                       xmlns:jms="https://www.smooks.org/xsd/smooks/jms-routing-2.0.xsd"
                       xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:ftl="https://www.smooks.org/xsd/smooks/freemarker-2.0.xsd">
-    
+
     <jb:bean beanId="object" class="java.util.HashMap" createOnElement="a">
-        <jb:value property="a" data="a" />
+        <jb:value property="a" data="a"/>
     </jb:bean>
 
     <core:smooks filterSourceOn="a">
@@ -69,7 +69,7 @@
         <jms:message>
             <jms:correlationIdPattern>${object.a}</jms:correlationIdPattern>
         </jms:message>
-        <jms:jndi properties="/org/smooks/cartridges/routing/jms/activemq/activemq.1.jndi.properties" />
+        <jms:jndi properties="/org/smooks/cartridges/routing/jms/activemq/activemq.1.jndi.properties"/>
     </jms:router>
 
 </smooks-resource-list>
