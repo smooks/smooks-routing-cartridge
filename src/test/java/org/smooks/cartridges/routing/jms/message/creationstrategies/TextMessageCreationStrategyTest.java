@@ -48,7 +48,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.smooks.cartridges.routing.jms.TestBean;
 import org.smooks.cartridges.routing.util.RouterTestHelper;
-import org.smooks.tck.MockExecutionContext;
+import org.smooks.testkit.MockExecutionContext;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
