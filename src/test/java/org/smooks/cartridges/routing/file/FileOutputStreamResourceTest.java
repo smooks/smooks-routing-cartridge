@@ -61,8 +61,8 @@ import org.smooks.engine.resource.visitor.smooks.NestedSmooksVisitor;
 import org.smooks.io.ResourceOutputStream;
 import org.smooks.io.payload.StringSource;
 import org.smooks.support.FileUtils;
-import org.smooks.tck.MockApplicationContext;
-import org.smooks.tck.MockExecutionContext;
+import org.smooks.testkit.MockApplicationContext;
+import org.smooks.testkit.MockExecutionContext;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 

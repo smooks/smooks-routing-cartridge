@@ -44,7 +44,7 @@ package org.smooks.cartridges.routing.file;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.smooks.tck.MockExecutionContext;
+import org.smooks.testkit.MockExecutionContext;
 
 import java.util.List;
 

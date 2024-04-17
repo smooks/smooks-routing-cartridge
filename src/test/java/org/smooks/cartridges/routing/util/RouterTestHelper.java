@@ -44,7 +44,7 @@ package org.smooks.cartridges.routing.util;
 
 import org.smooks.api.bean.repository.BeanId;
 import org.smooks.cartridges.routing.jms.TestBean;
-import org.smooks.tck.MockExecutionContext;
+import org.smooks.testkit.MockExecutionContext;
 
 public final class RouterTestHelper {
     private RouterTestHelper() {
