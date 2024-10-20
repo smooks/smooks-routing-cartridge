@@ -46,10 +46,9 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.smooks.Smooks;
-import org.smooks.support.StreamUtils;
+import org.smooks.io.source.StreamSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;

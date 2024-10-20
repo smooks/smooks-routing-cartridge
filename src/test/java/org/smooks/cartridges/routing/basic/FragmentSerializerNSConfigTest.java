@@ -46,11 +46,12 @@ import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.smooks.Smooks;
-import org.smooks.io.payload.JavaResult;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StreamSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
@@ -62,24 +63,24 @@ public class FragmentSerializerNSConfigTest {
     @Test
     public void test_children_only() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config-01-ext.xml"));
-        StreamSource source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
-        JavaResult result = new JavaResult();
+        StreamSource<InputStream> source = new StreamSource<>(getClass().getResourceAsStream("input-message-01.xml"));
+        JavaSink sink = new JavaSink();
 
-        smooks.filterSource(source, result);
+        smooks.filterSource(source, sink);
 
         XMLUnit.setIgnoreWhitespace( true );
-        XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream("children-only.xml")), new StringReader(result.getBean("soapBody").toString().trim()));
+        XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream("children-only.xml")), new StringReader(sink.getBean("soapBody").toString().trim()));
     }
 
     @Test
     public void test_all() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("smooks-config-02-ext.xml"));
         StreamSource source = new StreamSource(getClass().getResourceAsStream("input-message-01.xml"));
-        JavaResult result = new JavaResult();
+        JavaSink sink = new JavaSink();
 
-        smooks.filterSource(source, result);
+        smooks.filterSource(source, sink);
 
         XMLUnit.setIgnoreWhitespace( true );
-        XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream("all.xml")), new StringReader(result.getBean("soapBody").toString().trim()));
+        XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream("all.xml")), new StringReader(sink.getBean("soapBody").toString().trim()));
     }
 }
