@@ -53,7 +53,7 @@ import org.smooks.cartridges.templating.TemplatingConfiguration;
 import org.smooks.cartridges.templating.freemarker.FreeMarkerTemplateProcessor;
 import org.smooks.engine.DefaultApplicationContextBuilder;
 import org.smooks.engine.resource.visitor.smooks.NestedSmooksVisitor;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.source.StringSource;
 import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;

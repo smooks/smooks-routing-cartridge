@@ -59,7 +59,7 @@ import org.smooks.engine.lookup.LifecycleManagerLookup;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.engine.resource.visitor.smooks.NestedSmooksVisitor;
 import org.smooks.io.ResourceOutputStream;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.source.StringSource;
 import org.smooks.support.FileUtils;
 import org.smooks.testkit.MockApplicationContext;
 import org.smooks.testkit.MockExecutionContext;

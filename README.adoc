@@ -62,11 +62,11 @@ Then the Smooks code for executing this:
 [source,java]
 ----
 Smooks smooks = new Smooks(configStream);
-JavaResult javaResult = new JavaResult();
+JavaSink javaSink = new JavaSink();
 
-smooks.filterSource(new StreamSource(soapMessageStream), javaResult);
+smooks.filterSource(new StreamSource(soapMessageStream), javaSink);
 
-String bodyContent = javaResult.getBean("soapBody").toString().trim();
+String bodyContent = javaSink.getBean("soapBody").toString().trim();
 ----
 
 And of course, you can do all of this programmatically too (i.e., no need for the XML config):
@@ -77,10 +77,10 @@ Smooks smooks = new Smooks();
 
 smooks.addVisitor(new FragmentSerializer().setBindTo("soapBody"), "Envelope/Body");
 
-JavaResult javaResult = new JavaResult();
-smooks.filterSource(new StreamSource(soapMessageStream), javaResult);
+JavaSink javaSink = new JavaSink();
+smooks.filterSource(new StreamSource(soapMessageStream), javaSink);
 
-String bodyContent = javaResult.getBean("soapBody").toString().trim();
+String bodyContent = javaSink.getBean("soapBody").toString().trim();
 ----
 
 The code snippets above only show how to create the split messages and bind them into the bean context, from where they can be accessed. How about routing these split messages to another endpoint for processing?Well it's easy, just use one of the routing components as outlined in the following sections.
@@ -159,15 +159,21 @@ To achieve this with Smooks, we assemble the following Smooks configuration:
         <!--
          Every time we hit the end of an <order-item> element, apply this freemarker template,
          outputting the result to the "orderItemSplitStream" OutputStream, which is the file
-         output stream configured above.
-        -->
-(4)     <ftl:freemarker applyOnElement="order-item">
-            <ftl:template>target/classes/orderitem-split.ftl</ftl:template>
-            <ftl:use>
+         output stream configured below.
+         -->
+(4)      <core:smooks filterSourceOn="order-item">
+            <core:action>
                 <!-- Output the templating result to the "orderItemSplitStream" file output stream... -->
-                <ftl:outputTo outputStreamResource="orderItemSplitStream"/>
-            </ftl:use>
-        </ftl:freemarker>
+                <core:outputTo outputStreamResource="orderItemSplitStream"/>
+            </core:action>
+            <core:config>
+                <smooks-resource-list>
+                    <ftl:freemarker applyOnElement="order-item">
+                        <ftl:template>target/classes/orderitem-split.ftl</ftl:template>
+                    </ftl:freemarker>
+                </smooks-resource-list>
+            </core:config>
+        </core:smooks>
 
 </smooks-resource-list>
 ----
@@ -220,18 +226,25 @@ The following is an example `+<jms:router>+` configuration that routes an `+orde
             <jms:highWaterMark mark="3"/>
         </jms:router>
 
-(3)     <ftl:freemarker applyOnElement="order-item">
-            <!--
-             Note in the template that we need to use the special FreeMarker variable ".vars"
-             because of the hyphenated variable names ("order-item"). See http://freemarker.org/docs/ref_specvar.html.
-            -->
-            <ftl:template>/orderitem-split.ftl</ftl:template>
-            <ftl:use>
-                <!-- Bind the templating result into the bean context, from where
-                     it can be accessed by the JMSRouter (configured above). -->
-                <ftl:bindTo id="orderItem_xml"/>
-            </ftl:use>
-        </ftl:freemarker>
+ (3)    <core:smooks filterSourceOn="order-item">
+            <!-- Bind the templating result into the bean context, from where
+                 it can be accessed by the JMSRouter (configured above). -->
+            <core:action>
+                <core:bindTo id="orderItem_xml"/>
+            </core:action>
+            <core:config>
+                <smooks-resource-list>
+                    <!-- At each "order-item", apply a template to the "order" and "order-item" DOM model... -->
+                    <ftl:freemarker applyOnElement="#document">
+                        <!--
+                            Note in the template that we need to use the special FreeMarker variable ".vars"
+                            because of the hyphenated variable names ("order-item"). See http://freemarker.org/docs/ref_specvar.html.
+                        -->
+                        <ftl:template>/orderitem-split.ftl</ftl:template>
+                    </ftl:freemarker>
+                </smooks-resource-list>
+            </core:config>
+        </core:smooks>
 
 </smooks-resource-list>
 ----
@@ -247,7 +260,7 @@ In this case, we route the result of a FreeMarker templating operation to the JM
 <dependency>
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-routing-cartridge</artifactId>
-    <version>2.0.0-RC4</version>
+    <version>2.0.0</version>
 </dependency>
 ----
 
