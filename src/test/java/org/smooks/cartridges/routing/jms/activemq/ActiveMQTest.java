@@ -105,7 +105,7 @@ public class ActiveMQTest {
         NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
         nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.BIND_TO));
         nestedSmooksVisitor.setBindIdOptional(Optional.of("orderItem_xml"));
-        nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
+        nestedSmooksVisitor.setPipeline(nestedSmooks);
         
         // Create a HashMap, name it "object" and then bind the <a> data into it, keyed as "a"...
         Bean bean = new Bean(HashMap.class, "object", smooks.getApplicationContext().getRegistry());
