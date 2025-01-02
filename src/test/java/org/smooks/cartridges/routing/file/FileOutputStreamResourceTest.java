@@ -157,17 +157,16 @@ public class FileOutputStreamResourceTest {
     }
 
     @Test
-    public void config01Programmatic() throws IOException, SAXException {
-        Smooks smooks = new Smooks();
+    public void config01Programmatic() throws IOException {
 
-        try {
-            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().withSystemResources(false).build());
-            nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
+        try (Smooks smooks = new Smooks()) {
+            Smooks pipeline = new Smooks(new DefaultApplicationContextBuilder().withSystemResources(false).build());
+            pipeline.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
 
             NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
             nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.OUTPUT_TO));
             nestedSmooksVisitor.setOutputStreamResourceOptional(Optional.of("fileOS"));
-            nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
+            nestedSmooksVisitor.setPipeline(pipeline);
 
             Bean bean = new Bean(HashMap.class, "object", smooks.getApplicationContext().getRegistry());
             smooks.addVisitors(bean.bindTo("a", "a"));
@@ -179,8 +178,6 @@ public class FileOutputStreamResourceTest {
             assertEquals("1", getFileContents(file1));
             assertEquals("2", getFileContents(file2));
             assertEquals("3", getFileContents(file3));
-        } finally {
-            smooks.close();
         }
     }
 
@@ -193,13 +190,13 @@ public class FileOutputStreamResourceTest {
         final File outputFile = new File(destinationDir, outputFileName);
         
         try {
-            Smooks nestedSmooks = new Smooks(new DefaultApplicationContextBuilder().withSystemResources(false).build());
-            nestedSmooks.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
+            Smooks pipeline = new Smooks(new DefaultApplicationContextBuilder().withSystemResources(false).build());
+            pipeline.addVisitor(new FreeMarkerTemplateProcessor(new TemplatingConfiguration("${object.a}")), "a");
 
             NestedSmooksVisitor nestedSmooksVisitor = new NestedSmooksVisitor();
             nestedSmooksVisitor.setAction(Optional.of(NestedSmooksVisitor.Action.OUTPUT_TO));
             nestedSmooksVisitor.setOutputStreamResourceOptional(Optional.of(outputStreamRef));
-            nestedSmooksVisitor.setNestedSmooks(nestedSmooks);
+            nestedSmooksVisitor.setPipeline(pipeline);
 
             Bean bean = new Bean(HashMap.class, "object", smooks.getApplicationContext().getRegistry());
             smooks.addVisitors(bean.bindTo("a", "a"));
