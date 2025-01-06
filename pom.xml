@@ -250,7 +250,7 @@
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-templating-cartridge</artifactId>
-            <version>2.1.1</version>
+            <version>2.1.2-SNAPSHOT</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -262,7 +262,7 @@
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-javabean-cartridge</artifactId>
-            <version>2.0.2</version>
+            <version>2.0.3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
 
